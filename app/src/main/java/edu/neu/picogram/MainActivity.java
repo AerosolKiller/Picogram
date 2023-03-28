@@ -33,6 +33,9 @@ public class MainActivity extends AppCompatActivity {
       Intent intent = new Intent(this, TakePhotoActivity.class);
       startActivity(intent);
     }
-
+    if (view.getId() == R.id.bt_create) {
+      Intent intent = new Intent(this, EditActivity.class);
+      startActivity(intent);
+    }
   }
 }
