@@ -31,6 +31,7 @@
         android:id="@+id/tv_smallScalePic"
         android:layout_width="140dp"
         android:layout_height="35dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:text="Small Scale Games"
         android:textAlignment="textStart"
@@ -43,6 +44,7 @@
         android:id="@+id/tv_bigScalePic"
         android:layout_width="140dp"
         android:layout_height="35dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="24dp"
         android:text="Big Scale Games"
         android:textAlignment="textStart"
@@ -57,7 +59,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/tv_bigScalePic"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_bigScalePic"
         app:layout_constraintVertical_bias="0.846" />
 

@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -17,6 +18,7 @@ public class SettingActivity extends AppCompatActivity {
   private FirebaseAuth mAuth;
   private FirebaseAuth.AuthStateListener mAuthStateListener;
   private Button signInOptionButton, createAccountOptionButton;
+  private ImageButton homeButton;
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -25,16 +27,17 @@ public class SettingActivity extends AppCompatActivity {
     // create buttons for create account and sign in
     signInOptionButton = findViewById(R.id.bt_signin);
     createAccountOptionButton = findViewById(R.id.bt_createAccount);
+    homeButton = findViewById(R.id.ib_homeButton);
 
     mAuth = FirebaseAuth.getInstance();
 
     mAuthStateListener = firebaseAuth -> {
       FirebaseUser user = firebaseAuth.getCurrentUser();
 
-      if (user != null) {
-        finish();
-        startActivity(new Intent(this, GamePlayActivity.class));
-      }
+//      if (user != null) {
+//        finish();
+//        startActivity(new Intent(this, GamePlayActivity.class));
+//      }
     };
 
     signInOptionButton.setOnClickListener(v -> showSignInDialog());
