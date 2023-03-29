@@ -16,20 +16,15 @@ public class SettingActivity extends AppCompatActivity {
 
   private FirebaseAuth mAuth;
   private FirebaseAuth.AuthStateListener mAuthStateListener;
-  private Button signInButton, createAccountButton;
+  private Button signInOptionButton, createAccountOptionButton;
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_setting);
 
     // create buttons for create account and sign in
-    signInButton = findViewById(R.id.bt_signin);
-    createAccountButton = findViewById(R.id.bt_createAccount);
-
-    signInButton.setOnClickListener(v -> showSignInDialog());
-    createAccountButton.setOnClickListener(v -> showCreateAccountDialog());
-
-
+    signInOptionButton = findViewById(R.id.bt_signin);
+    createAccountOptionButton = findViewById(R.id.bt_createAccount);
 
     mAuth = FirebaseAuth.getInstance();
 
@@ -41,6 +36,9 @@ public class SettingActivity extends AppCompatActivity {
         startActivity(new Intent(this, GamePlayActivity.class));
       }
     };
+
+    signInOptionButton.setOnClickListener(v -> showSignInDialog());
+    createAccountOptionButton.setOnClickListener(v -> showCreateAccountDialog());
   }
 
   protected void onStart() {
@@ -58,9 +56,9 @@ public class SettingActivity extends AppCompatActivity {
     LayoutInflater inflater = getLayoutInflater();
     View view = inflater.inflate(R.layout.dialog_signin, null);
 
-    EditText et_email = findViewById(R.id.email_edit_text);
-    EditText et_password = findViewById(R.id.password_edit_text);
-    Button signInToAccount = findViewById(R.id.sign_in_button);
+    EditText et_email = view.findViewById(R.id.email_edit_text);
+    EditText et_password = view.findViewById(R.id.password_edit_text);
+    Button signInToAccount = view.findViewById(R.id.sign_in_button);
 
     signInToAccount.setOnClickListener(
             v -> signIn(et_email.getText().toString(), et_password.getText().toString())
@@ -88,9 +86,10 @@ public class SettingActivity extends AppCompatActivity {
     LayoutInflater inflater = getLayoutInflater();
     View view = inflater.inflate(R.layout.dialog_createaccount, null);
 
-    EditText et_userName = findViewById(R.id.username_edit_text);
-    EditText et_email = findViewById(R.id.email_edit_text);
-    EditText et_password = findViewById(R.id.password_edit_text);
+    EditText et_userName = view.findViewById(R.id.username_edit_text);
+    EditText et_email = view.findViewById(R.id.email_edit_text);
+    EditText et_password = view.findViewById(R.id.password_edit_text);
+    Button createAccountButton = view.findViewById(R.id.create_account_button);
 
     createAccountButton.setOnClickListener(
             v -> createAccount(et_email.getText().toString(), et_password.getText().toString())
