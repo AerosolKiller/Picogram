@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1040994970330",
+    "project_id": "picogram-2d8e0",
+    "storage_bucket": "picogram-2d8e0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1040994970330:android:1db56bd7d83a0a431793e3",
+        "android_client_info": {
+          "package_name": "edu.neu.picogram"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1040994970330-m9l6d9q1remvcku41f7d88r71u7v210n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvA6WW45CtIAsykyNKje1AkA_MKOntqds"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1040994970330-m9l6d9q1remvcku41f7d88r71u7v210n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
