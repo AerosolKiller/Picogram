@@ -4,21 +4,29 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.util.Log;import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SettingActivity extends AppCompatActivity {
 
   private FirebaseAuth mAuth;
   private FirebaseAuth.AuthStateListener mAuthStateListener;
-  private Button signInOptionButton, createAccountOptionButton;
+  private Button signInOptionButton, createAccountOptionButton, signOutButton;
   private ImageButton homeButton;
+  private FirebaseFirestore db;
+
+  private TextView tv_signInOn;
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -28,20 +36,25 @@ public class SettingActivity extends AppCompatActivity {
     signInOptionButton = findViewById(R.id.bt_signin);
     createAccountOptionButton = findViewById(R.id.bt_createAccount);
     homeButton = findViewById(R.id.ib_homeButton);
+    tv_signInOn = findViewById(R.id.tv_signInOn);
+    signOutButton = findViewById(R.id.bt_signOut);
 
     mAuth = FirebaseAuth.getInstance();
+    db = FirebaseFirestore.getInstance();
 
     mAuthStateListener = firebaseAuth -> {
       FirebaseUser user = firebaseAuth.getCurrentUser();
-
-//      if (user != null) {
-//        finish();
-//        startActivity(new Intent(this, GamePlayActivity.class));
-//      }
+      if (user != null) {
+        signInOptionButton.setVisibility(View.GONE);
+        createAccountOptionButton.setVisibility(View.GONE);
+        signOutButton.setVisibility(View.VISIBLE);
+        fetchUsername(user.getUid());
+      }
     };
 
     signInOptionButton.setOnClickListener(v -> showSignInDialog());
     createAccountOptionButton.setOnClickListener(v -> showCreateAccountDialog());
+    signOutButton.setOnClickListener(v -> signOutAccount());
   }
 
   protected void onStart() {
@@ -95,7 +108,9 @@ public class SettingActivity extends AppCompatActivity {
     Button createAccountButton = view.findViewById(R.id.create_account_button);
 
     createAccountButton.setOnClickListener(
-            v -> createAccount(et_email.getText().toString(), et_password.getText().toString())
+            v -> createAccount(et_email.getText().toString(),
+                    et_password.getText().toString(),
+                    et_userName.getText().toString())
     );
 
     builder.setView(view);
@@ -103,15 +118,59 @@ public class SettingActivity extends AppCompatActivity {
     createAccountDialog.show();
   }
 
-  private void createAccount(String email, String password) {
-    mAuth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this, task -> {
+  private void createAccount(String email, String password, String userName) {
+    mAuth
+        .createUserWithEmailAndPassword(email, password)
+        .addOnCompleteListener(
+            this,
+            task -> {
               if (task.isSuccessful()) {
+                FirebaseUser user = mAuth.getCurrentUser();
+                if (user != null) {
+                  // save username to database
+                  Map<String, Object> userData = new HashMap<>();
+                  userData.put("Username", userName);
+
+                  db.collection("users").
+                          document(user.getUid()).
+                          set(userData).
+                          addOnSuccessListener(aVoid -> {
+                            Toast.makeText(this, "Username saved successfully", Toast.LENGTH_SHORT).show();
+                          }).
+                          addOnFailureListener(error -> {
+                            Toast.makeText(this, "Failed to save username", Toast.LENGTH_SHORT).show();
+                          });
+                }
                 Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show();
+
               } else {
                 Toast.makeText(this, "Account creation failed", Toast.LENGTH_SHORT).show();
               }
             });
   }
+
+  private void signOutAccount() {
+    mAuth.signOut();
+    signOutButton.setVisibility(View.GONE);
+    signInOptionButton.setVisibility(View.VISIBLE);
+    createAccountOptionButton.setVisibility(View.VISIBLE);
+    String tv_signInReminder = "Log in or create an account to save your picogram journey";
+    tv_signInOn.setText(tv_signInReminder);
+  }
+
+  private void fetchUsername(String uid) {
+    db.collection("users").document(uid)
+            .get()
+            .addOnCompleteListener(task -> {
+              if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document != null && document.exists()) {
+                  String username = document.getString("Username");
+                  tv_signInOn.setText("Welcome!\n" + username);
+                }
+              }
+            });
+  }
+
 
 }
