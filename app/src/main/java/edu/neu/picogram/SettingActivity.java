@@ -4,7 +4,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;import android.view.LayoutInflater;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -55,6 +55,7 @@ public class SettingActivity extends AppCompatActivity {
     signInOptionButton.setOnClickListener(v -> showSignInDialog());
     createAccountOptionButton.setOnClickListener(v -> showCreateAccountDialog());
     signOutButton.setOnClickListener(v -> signOutAccount());
+    homeButton.setOnClickListener(v -> backToHome());
   }
 
   protected void onStart() {
@@ -76,13 +77,19 @@ public class SettingActivity extends AppCompatActivity {
     EditText et_password = view.findViewById(R.id.password_edit_text);
     Button signInToAccount = view.findViewById(R.id.sign_in_button);
 
-    signInToAccount.setOnClickListener(
-            v -> signIn(et_email.getText().toString(), et_password.getText().toString())
-    );
-
     builder.setView(view);
     AlertDialog signInDialog = builder.create();
     signInDialog.show();
+
+    signInToAccount.setOnClickListener(v -> {
+      String email = et_email.getText().toString();
+      String password = et_password.getText().toString();
+
+      if (!email.isEmpty() && !password.isEmpty()) {
+        signIn(email, password);
+        signInDialog.dismiss();
+      }
+    });
   }
 
   private void signIn(String email, String password) {
@@ -107,15 +114,22 @@ public class SettingActivity extends AppCompatActivity {
     EditText et_password = view.findViewById(R.id.password_edit_text);
     Button createAccountButton = view.findViewById(R.id.create_account_button);
 
-    createAccountButton.setOnClickListener(
-            v -> createAccount(et_email.getText().toString(),
-                    et_password.getText().toString(),
-                    et_userName.getText().toString())
-    );
-
     builder.setView(view);
     AlertDialog createAccountDialog = builder.create();
     createAccountDialog.show();
+
+    createAccountButton.setOnClickListener(v -> {
+      String email = et_email.getText().toString();
+      String password = et_password.getText().toString();
+      String userName = et_userName.getText().toString();
+
+      if (!email.isEmpty() && !password.isEmpty() && !userName.isEmpty()) {
+        createAccount(email, password, userName);
+        createAccountDialog.dismiss();
+      } else {
+        Toast.makeText(this, "Please fill out all fields!", Toast.LENGTH_LONG).show();
+      }
+    });
   }
 
   private void createAccount(String email, String password, String userName) {
@@ -172,5 +186,9 @@ public class SettingActivity extends AppCompatActivity {
             });
   }
 
+  private void backToHome() {
+    Intent intent = new Intent(this, MainActivity.class);
+    startActivity(intent);
+  }
 
 }
