@@ -22,7 +22,8 @@ public class SettingActivity extends AppCompatActivity {
 
   private FirebaseAuth mAuth;
   private FirebaseAuth.AuthStateListener mAuthStateListener;
-  private Button signInOptionButton, createAccountOptionButton, signOutButton;
+  private Button signInOptionButton, createAccountOptionButton,
+          signOutButton, helpButton, notificationButton;
   private ImageButton homeButton;
   private FirebaseFirestore db;
 
@@ -38,6 +39,7 @@ public class SettingActivity extends AppCompatActivity {
     homeButton = findViewById(R.id.ib_homeButton);
     tv_signInOn = findViewById(R.id.tv_signInOn);
     signOutButton = findViewById(R.id.bt_signOut);
+    helpButton = findViewById(R.id.bt_help);
 
     mAuth = FirebaseAuth.getInstance();
     db = FirebaseFirestore.getInstance();
@@ -56,6 +58,7 @@ public class SettingActivity extends AppCompatActivity {
     createAccountOptionButton.setOnClickListener(v -> showCreateAccountDialog());
     signOutButton.setOnClickListener(v -> signOutAccount());
     homeButton.setOnClickListener(v -> backToHome());
+    helpButton.setOnClickListener(v -> helpPage());
   }
 
   protected void onStart() {
@@ -188,6 +191,11 @@ public class SettingActivity extends AppCompatActivity {
 
   private void backToHome() {
     Intent intent = new Intent(this, MainActivity.class);
+    startActivity(intent);
+  }
+
+  private void helpPage() {
+    Intent intent = new Intent(this, helpActivity.class);
     startActivity(intent);
   }
 
