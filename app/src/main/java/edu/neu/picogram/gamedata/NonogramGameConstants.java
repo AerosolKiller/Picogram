@@ -58,6 +58,23 @@ public class NonogramGameConstants {
     Nonogram game4 =
         new Nonogram(
             "Puzzle 4",
+            5,
+            5,
+            new int[][] {{2}, {3}, {1, 1}, {3}, {3}},
+            new int[][] {{3}, {2}, {5}, {2}, {1}},
+            new int[][] {
+              {0, 0, 1, 1, 0},
+              {0, 0, 1, 1, 1},
+              {1, 0, 1, 0, 0},
+              {1, 1, 1, 0, 0},
+              {1, 1, 1, 0, 0}
+            });
+
+    games.add(game4);
+
+    Nonogram game5 =
+        new Nonogram(
+            "Puzzle 5",
             10,
             10,
             new int[][] {{1}, {2}, {3}, {1, 1}, {1}, {1}, {3}, {4}, {4}, {2}},
@@ -75,11 +92,11 @@ public class NonogramGameConstants {
               {0, 0, 0, 1, 1, 0, 0, 0, 0, 0}
             });
 
-    games.add(game4);
+    games.add(game5);
 
-    Nonogram game5 =
+    Nonogram game6 =
         new Nonogram(
-            "Puzzle 5",
+            "Puzzle 6",
             10,
             10,
             new int[][] {{0}, {4}, {2, 2}, {2}, {2}, {2}, {0}, {2}, {2}, {0}},
@@ -96,7 +113,7 @@ public class NonogramGameConstants {
               {0, 0, 0, 0, 1, 1, 0, 0, 0, 0},
               {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
             });
-    games.add(game5);
+    games.add(game6);
 
     return games;
   }
