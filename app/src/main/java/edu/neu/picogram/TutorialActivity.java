@@ -14,7 +14,7 @@ import java.util.List;
 public class TutorialActivity extends AppCompatActivity {
 
   private int tutorialId = 0;
-  private NonogramTutorialView nonogramView;
+  private NonogramView nonogramView;
   private List<NonogramTutorial> tutorials;
 
   @Override
