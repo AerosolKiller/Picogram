@@ -8,7 +8,7 @@ public class NonogramTutorialConstants {
     ArrayList<NonogramTutorial> tutorials = new ArrayList<>();
     NonogramTutorial nonogramTutorial2 =
         new NonogramTutorial(
-            2,
+            "Nonogram Tutorial 2",
             "Playing the game is easy! Just click on a square to fill it in. \n Fill in all the squares in this line",
             true,
             3,
@@ -21,7 +21,7 @@ public class NonogramTutorialConstants {
 
     NonogramTutorial nonogramTutorial3 =
         new NonogramTutorial(
-            3,
+            "Nonogram Tutorial 3",
             "To empty a square just click on it again. \n Clean them all!",
             true,
             3,
@@ -35,14 +35,14 @@ public class NonogramTutorialConstants {
 
     NonogramTutorial nonogramTutorial4 =
         new NonogramTutorial(
-            3,
+            "Nonogram Tutorial 4",
             "The numbers at the end of the line indicate the number of squares to be filled in this line. \n"
                 + "Fill in the number of squares indicated by the numbers on the left fo the line",
             true,
             5,
             1,
-            null,
             new int[][] {{5}},
+            null,
             new int[][] {{1, 1, 1, 1, 1}});
 
     tutorials.add(nonogramTutorial4);

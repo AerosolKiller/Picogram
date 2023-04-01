@@ -6,15 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".GameActivity">
 
-    <Spinner
-        android:id="@+id/spinner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/nonogramView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <edu.neu.picogram.NonogramView
         android:id="@+id/nonogramView"
         android:layout_width="0dp"
