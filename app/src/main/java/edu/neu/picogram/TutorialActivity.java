@@ -1,6 +1,6 @@
 package edu.neu.picogram;
 
-import static edu.neu.picogram.NonogramTutorialConstants.getTutorials;
+import static edu.neu.picogram.gamedata.NonogramTutorialConstants.getTutorials;
 
 import android.os.Bundle;
 import android.widget.Button;

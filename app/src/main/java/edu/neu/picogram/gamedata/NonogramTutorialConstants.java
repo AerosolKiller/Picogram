@@ -1,5 +1,6 @@
-package edu.neu.picogram;
+package edu.neu.picogram.gamedata;
 
+import edu.neu.picogram.NonogramTutorial;
 import java.util.ArrayList;
 
 public class NonogramTutorialConstants {
