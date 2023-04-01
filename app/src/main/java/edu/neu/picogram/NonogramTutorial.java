@@ -23,7 +23,7 @@ public class NonogramTutorial extends Nonogram {
       int[][] rowClues,
       int[][] colClues,
       int[][] solution) {
-    super(width, height, rowClues, colClues, solution);
+    super(name, width, height, rowClues, colClues, solution);
     this.name = name;
     this.description = description;
     this.isGame = isGame;

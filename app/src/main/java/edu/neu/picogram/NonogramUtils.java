@@ -12,7 +12,7 @@ import org.json.JSONObject;
 
 public class NonogramUtils {
 
-  public static void saveGame(int[][] rowClues, int[][] colClues, int[][] solution) {
+  public static void saveGame(String name, int[][] rowClues, int[][] colClues, int[][] solution) {
     // 把当前游戏的状态转换为json数组，然后转换为json字符串
     // 当前只是在Logcat中打印出来，后续会把json字符串保存为文件
     JSONArray jsonArray = new JSONArray(Arrays.asList(colClues));
@@ -23,6 +23,7 @@ public class NonogramUtils {
       jsonObject.put("colClues", jsonArray);
       jsonObject.put("rowClues", jsonArray1);
       jsonObject.put("solution", jsonArray2);
+      jsonObject.put("name", name);
       String json = jsonObject.toString();
       Log.d("json", json);
     } catch (Exception e) {
@@ -35,7 +36,6 @@ public class NonogramUtils {
    * 方法本质是打开文件，把文件内部先读到byte数组，再转成String，最后通过json解析，转化为json对象.
    * 在json对象中，通过key，找到对应的json数组，再把json数组转成int数组，或者boolean数组.
    *
-   * @param context
    * @param level res 内raw 文件夹中的文件，实际上有个int类型的id， 通过id，可以找到对应的文件.
    */
   public static Nonogram restoreGame(Context context, int level) {
@@ -56,6 +56,7 @@ public class NonogramUtils {
       JSONArray jsonArray = jsonObject.getJSONArray("colClues");
       JSONArray jsonArray1 = jsonObject.getJSONArray("rowClues");
       JSONArray jsonArray2 = jsonObject.getJSONArray("solution");
+      String name = jsonObject.getString("name");
       colClues = new int[jsonArray.length()][];
       rowClues = new int[jsonArray1.length()][];
       solution = new int[jsonArray2.length()][];
@@ -83,7 +84,7 @@ public class NonogramUtils {
         }
         solution[i] = ints;
       }
-      return new Nonogram(colClues.length, rowClues.length, rowClues, colClues, solution);
+      return new Nonogram(name, colClues.length, rowClues.length, rowClues, colClues, solution);
     } catch (Exception e) {
       e.printStackTrace();
     }

@@ -23,14 +23,14 @@ public class EditActivity extends AppCompatActivity {
     rowClues = new int[height][];
     colClues = new int[width][];
     solution = new int[width][height];
-    Nonogram game = new Nonogram(width, height, rowClues, colClues, solution);
+    Nonogram game = new Nonogram("", width, height, rowClues, colClues, solution);
     nonogramView.setGame(game);
     // 保存按钮，点击后将游戏保存为json格式
     Button button = findViewById(R.id.saveAnswer);
     button.setOnClickListener(
         v -> {
           Nonogram newGame = nonogramView.getGame();
-          saveGame(newGame.getRowClues(), newGame.getColClues(), newGame.getSolution());
+          saveGame("", newGame.getRowClues(), newGame.getColClues(), newGame.getSolution());
         });
   }
 }
