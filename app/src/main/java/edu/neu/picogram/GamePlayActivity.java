@@ -1,6 +1,6 @@
 package edu.neu.picogram;
 
-import static edu.neu.picogram.NonogramGameConstants.getGames;
+import static edu.neu.picogram.gamedata.NonogramGameConstants.getGames;
 
 import android.content.Context;
 import android.content.Intent;

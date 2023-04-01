@@ -13,16 +13,15 @@ import android.view.View;
 
 public class NonogramView extends View {
   private Nonogram game;
-  private Paint gridPaint;
-  private Paint cluePaint;
-  private Paint cellPaint;
-  private Paint solutionPaint;
+  private final Paint gridPaint;
+  private final Paint cluePaint;
+  private final Paint cellPaint;
+  private final Paint solutionPaint;
   private int prevCol = -1;
   private int prevRow = -1;
   private boolean editMode = false;
   private boolean mode = true;
   private boolean showSolution = false;
-  private float ratio = 0.75f;
   int cellSize;
   int offsetX;
   int offsetY;
@@ -61,6 +60,7 @@ public class NonogramView extends View {
   private void init() {
     // 通过当前view的宽高，以及是几乘几的nonogram对象，计算出每个格子的大小
     // 通过ratio来控制格子的大小，让格子不至于太大或者太小
+    float ratio = 0.75f;
     cellSize =
         (int) (Math.min(getWidth() / game.getWidth(), getHeight() / game.getHeight()) * ratio);
     // 因为要让游戏界面居中，默认是在左上角绘制，所以需要一些偏移量

@@ -1,7 +1,6 @@
 package edu.neu.picogram;
 
 public class NonogramTutorial extends Nonogram {
-  private String name;
   private final String description;
   private final Boolean isGame;
   private int imageId;
