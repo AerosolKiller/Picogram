@@ -51,6 +51,10 @@ public class NonogramTutorial extends Nonogram {
     return isGame;
   }
 
+  public int getImageId() {
+    return imageId;
+  }
+
   @Override
   public boolean isSolved() {
     // 检查当前游戏的状态和解是否一致

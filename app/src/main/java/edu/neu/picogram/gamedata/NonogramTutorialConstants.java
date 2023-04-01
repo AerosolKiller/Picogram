@@ -1,16 +1,27 @@
 package edu.neu.picogram.gamedata;
 
 import edu.neu.picogram.NonogramTutorial;
+import edu.neu.picogram.R;
 import java.util.ArrayList;
 
 public class NonogramTutorialConstants {
 
   public static ArrayList<NonogramTutorial> getTutorials() {
     ArrayList<NonogramTutorial> tutorials = new ArrayList<>();
+    NonogramTutorial nonogramTutorial1 =
+        new NonogramTutorial(
+            "Nonogram Tutorial 1",
+            "Picogram is a puzzle game which involves revealing a picture by filling in the square on a grid.\n"
+                + "The numbers on top and on the left hand side of the grid help finding which squares should be filled in.",
+            false,
+            R.drawable.tutorial_img1);
+
+    tutorials.add(nonogramTutorial1);
+
     NonogramTutorial nonogramTutorial2 =
         new NonogramTutorial(
             "Nonogram Tutorial 2",
-            "Playing the game is easy! Just click on a square to fill it in. \n Fill in all the squares in this line",
+            "Playing the game is easy! Just click on a square to fill it in.\nFill in all the squares in this line",
             true,
             3,
             1,

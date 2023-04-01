@@ -15,15 +15,15 @@ public class NonogramUtils {
   public static void saveGame(String name, int[][] rowClues, int[][] colClues, int[][] solution) {
     // 把当前游戏的状态转换为json数组，然后转换为json字符串
     // 当前只是在Logcat中打印出来，后续会把json字符串保存为文件
-    JSONArray jsonArray = new JSONArray(Arrays.asList(colClues));
-    JSONArray jsonArray1 = new JSONArray(Arrays.asList(rowClues));
+    JSONArray jsonArray = new JSONArray(Arrays.asList(rowClues));
+    JSONArray jsonArray1 = new JSONArray(Arrays.asList(colClues));
     JSONArray jsonArray2 = new JSONArray(Arrays.asList(solution));
     JSONObject jsonObject = new JSONObject();
     try {
-      jsonObject.put("colClues", jsonArray);
-      jsonObject.put("rowClues", jsonArray1);
-      jsonObject.put("solution", jsonArray2);
       jsonObject.put("name", name);
+      jsonObject.put("rowClues", jsonArray);
+      jsonObject.put("colClues", jsonArray1);
+      jsonObject.put("solution", jsonArray2);
       String json = jsonObject.toString();
       Log.d("json", json);
     } catch (Exception e) {
@@ -36,14 +36,14 @@ public class NonogramUtils {
    * 方法本质是打开文件，把文件内部先读到byte数组，再转成String，最后通过json解析，转化为json对象.
    * 在json对象中，通过key，找到对应的json数组，再把json数组转成int数组，或者boolean数组.
    *
-   * @param level res 内raw 文件夹中的文件，实际上有个int类型的id， 通过id，可以找到对应的文件.
+   * @param fileID res 内raw 文件夹中的文件，实际上有个int类型的id， 通过id，可以找到对应的文件.
    */
-  public static Nonogram restoreGame(Context context, int level) {
-    int[][] colClues;
+  public static Nonogram restoreGame(Context context, int fileID) {
     int[][] rowClues;
+    int[][] colClues;
     int[][] solution;
     try {
-      InputStream inputStream = context.getResources().openRawResource(level);
+      InputStream inputStream = context.getResources().openRawResource(fileID);
       ByteArrayOutputStream result = new ByteArrayOutputStream();
       byte[] buffer = new byte[1024];
       int length;
@@ -53,12 +53,12 @@ public class NonogramUtils {
       inputStream.close();
       String jsonString = result.toString("UTF-8");
       JSONObject jsonObject = new JSONObject(jsonString);
-      JSONArray jsonArray = jsonObject.getJSONArray("colClues");
-      JSONArray jsonArray1 = jsonObject.getJSONArray("rowClues");
+      JSONArray jsonArray = jsonObject.getJSONArray("rowClues");
+      JSONArray jsonArray1 = jsonObject.getJSONArray("colClues");
       JSONArray jsonArray2 = jsonObject.getJSONArray("solution");
       String name = jsonObject.getString("name");
-      colClues = new int[jsonArray.length()][];
-      rowClues = new int[jsonArray1.length()][];
+      rowClues = new int[jsonArray.length()][];
+      colClues = new int[jsonArray1.length()][];
       solution = new int[jsonArray2.length()][];
       for (int i = 0; i < jsonArray.length(); i++) {
         JSONArray jsonArray3 = jsonArray.getJSONArray(i);
@@ -66,7 +66,7 @@ public class NonogramUtils {
         for (int j = 0; j < jsonArray3.length(); j++) {
           ints[j] = jsonArray3.getInt(j);
         }
-        colClues[i] = ints;
+        rowClues[i] = ints;
       }
       for (int i = 0; i < jsonArray1.length(); i++) {
         JSONArray jsonArray3 = jsonArray1.getJSONArray(i);
@@ -74,7 +74,7 @@ public class NonogramUtils {
         for (int j = 0; j < jsonArray3.length(); j++) {
           ints[j] = jsonArray3.getInt(j);
         }
-        rowClues[i] = ints;
+        colClues[i] = ints;
       }
       for (int i = 0; i < jsonArray2.length(); i++) {
         JSONArray jsonArray3 = jsonArray2.getJSONArray(i);
