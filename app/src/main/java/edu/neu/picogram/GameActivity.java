@@ -1,6 +1,6 @@
 package edu.neu.picogram;
 
-import static edu.neu.picogram.NonogramUtils.restoreGame;
+import static edu.neu.picogram.NonogramGameConstants.getGame;
 
 import android.os.Bundle;
 import android.widget.Button;
@@ -17,12 +17,8 @@ public class GameActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     // 游戏关卡存储在raw文件夹中，每个关卡对应一个json文件，读取第一关的json文件作为默认关卡
     //        restoreGame(this, R.raw.level1);
-    int gameId = this.getIntent().getExtras().getInt("level");
-    if (gameId != 0) {
-      game = restoreGame(this, gameId);
-    } else {
-      game = restoreGame(this, R.raw.level1);
-    }
+    int gameId = this.getIntent().getExtras().getInt("index");
+    game = getGame(gameId);
     // 读取关卡后，实际上给solution，rowClues，colClues赋值了，创建Nonogram对象
     setContentView(R.layout.activity_game);
     // NonogramView是我们自定义的绘制游戏界面的View，作为一个组建，activity_game中引用
