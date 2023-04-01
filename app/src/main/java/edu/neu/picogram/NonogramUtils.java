@@ -1,6 +1,10 @@
 package edu.neu.picogram;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.util.Log;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -163,5 +167,25 @@ public class NonogramUtils {
   private static int[] toIntArray(List<Integer> list) {
     // 辅助函数方便把List<Integer>转换成int[]
     return list.stream().mapToInt(Integer::intValue).toArray();
+  }
+
+  public static Bitmap drawNonogram(Nonogram game) {
+    int[][] solution = game.getSolution();
+    int targetSize = 100;
+    int ratio = Math.max(1, Math.min(targetSize / game.getWidth(), targetSize / game.getHeight()));
+    Bitmap bitmap = Bitmap.createBitmap(
+        game.getWidth() * ratio, game.getHeight() * ratio, Bitmap.Config.ARGB_8888);
+    Canvas canvas = new Canvas(bitmap);
+    Paint paint = new Paint();
+    paint.setColor(Color.BLACK);
+    paint.setStyle(Paint.Style.FILL);
+    for (int row = 0; row < game.getHeight(); row++) {
+      for (int col = 0; col < game.getWidth(); col++) {
+        if (solution[row][col] == 1) {
+          canvas.drawRect(col * ratio, row * ratio, (col + 1) * ratio, (row + 1) * ratio, paint);
+        }
+      }
+    }
+    return bitmap;
   }
 }

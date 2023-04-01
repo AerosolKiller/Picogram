@@ -1,5 +1,6 @@
 package edu.neu.picogram;
 
+import static edu.neu.picogram.NonogramUtils.drawNonogram;
 import static edu.neu.picogram.gamedata.NonogramGameConstants.getGames;
 
 import android.content.Context;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -66,6 +68,7 @@ class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder> {
           intent.putExtra("index", position);
           context.startActivity(intent);
         });
+    holder.gameImage.setImageBitmap(drawNonogram(game));
   }
 
   @Override
@@ -76,10 +79,12 @@ class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder> {
   public static class GameViewHolder extends RecyclerView.ViewHolder {
 
     private final TextView gameName;
+    private final ImageView gameImage;
 
     public GameViewHolder(@NonNull View itemView) {
       super(itemView);
       gameName = itemView.findViewById(R.id.name);
+      gameImage = itemView.findViewById(R.id.image);
     }
   }
 }
