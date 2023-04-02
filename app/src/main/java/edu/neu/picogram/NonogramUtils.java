@@ -192,6 +192,7 @@ public class NonogramUtils {
     return bitmap;
   }
 
+  // 保存json文件, 保存在本机
   public static void savaJson(Context context, JSONObject jsonObject, String fileName) {
     // Save json file
     try {
