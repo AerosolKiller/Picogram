@@ -1,63 +1,52 @@
 package edu.neu.picogram;
 
+import static edu.neu.picogram.NonogramUtils.drawNonogram;
+import static edu.neu.picogram.gamedata.NonogramGameConstants.getGames;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import java.util.ArrayList;
 import java.util.List;
 
 public class GamePlayActivity extends AppCompatActivity {
 
-  ImageButton homeButton;
-  RecyclerView smallScaleGameRecyclerViewclerView;
-  List<GameItem> games;
+  RecyclerView smallScaleGameRecyclerView;
+  List<Nonogram> games;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    games = new ArrayList<>();
-    games.add(new GameItem("level1", R.raw.level1));
-    games.add(new GameItem("level2", R.raw.level2));
-    games.add(new GameItem("level3", R.raw.level3));
-    games.add(new GameItem("level11", R.raw.level11));
-    games.add(new GameItem("level21", R.raw.level12));
+    games = getGames();
     setContentView(R.layout.activity_game_play);
     createRecyclerView();
-
-    homeButton = findViewById(R.id.homeButton);
-    homeButton.setOnClickListener(v -> backHome());
   }
 
   public void createRecyclerView() {
-    smallScaleGameRecyclerViewclerView = findViewById(R.id.recyclerView2);
+    smallScaleGameRecyclerView = findViewById(R.id.recyclerView2);
     GameAdapter gameAdapter = new GameAdapter(this, games);
-    smallScaleGameRecyclerViewclerView.setAdapter(gameAdapter);
-    smallScaleGameRecyclerViewclerView.setHasFixedSize(true);
-    RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 2);
-    smallScaleGameRecyclerViewclerView.setLayoutManager(layoutManager);
-  }
-
-  private void backHome() {
-    Intent intent = new Intent(this, MainActivity.class);
-    startActivity(intent);
+    smallScaleGameRecyclerView.setAdapter(gameAdapter);
+    smallScaleGameRecyclerView.setHasFixedSize(true);
+    RecyclerView.LayoutManager layoutManager =
+        new GridLayoutManager(this, 2, RecyclerView.HORIZONTAL, false);
+    smallScaleGameRecyclerView.setLayoutManager(layoutManager);
   }
 }
 
 class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder> {
 
-  private List<GameItem> games;
-  private Context context;
+  private final List<Nonogram> games;
+  private final Context context;
 
-  public GameAdapter(Context context, List<GameItem> games) {
+  public GameAdapter(Context context, List<Nonogram> games) {
     this.context = context;
     this.games = games;
   }
@@ -71,14 +60,15 @@ class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder> {
 
   @Override
   public void onBindViewHolder(@NonNull GameViewHolder holder, int position) {
-    GameItem game = games.get(position);
-    holder.gameName.setText(game.getGameName());
+    Nonogram game = games.get(position);
+    holder.gameName.setText(game.getName());
     holder.itemView.setOnClickListener(
         v -> {
           Intent intent = new Intent(context, GameActivity.class);
-          intent.putExtra("level", game.getLevel());
+          intent.putExtra("index", position);
           context.startActivity(intent);
         });
+    holder.gameImage.setImageBitmap(drawNonogram(game));
   }
 
   @Override
@@ -86,14 +76,15 @@ class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder> {
     return games.size();
   }
 
-  public class GameViewHolder extends RecyclerView.ViewHolder {
+  public static class GameViewHolder extends RecyclerView.ViewHolder {
 
-    private TextView gameName;
+    private final TextView gameName;
+    private final ImageView gameImage;
 
     public GameViewHolder(@NonNull View itemView) {
       super(itemView);
       gameName = itemView.findViewById(R.id.name);
+      gameImage = itemView.findViewById(R.id.image);
     }
   }
-
 }
