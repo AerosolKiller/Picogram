@@ -32,5 +32,22 @@ public class EditActivity extends AppCompatActivity {
           Nonogram newGame = nonogramView.getGame();
           saveGame("", newGame.getRowClues(), newGame.getColClues(), newGame.getSolution());
         });
+
+    //    boolean[][] solution = convertToNonogramMatrix(this, R.drawable.tutorial_img1, 200);
+    //    JSONObject jsonObject = new JSONObject();
+    //    try {
+    //      JSONArray solutionArray = new JSONArray();
+    //      for (int i = 0; i < solution.length; i++) {
+    //        JSONArray rowArray = new JSONArray();
+    //        for (int j = 0; j < solution[0].length; j++) {
+    //          rowArray.put(solution[i][j]);
+    //        }
+    //        solutionArray.put(rowArray);
+    //      }
+    //      jsonObject.put("solution", solutionArray);
+    //    } catch (Exception e) {
+    //      Log.e("EditActivity", "Error when converting solution to json");
+    //    }
+    //    savaJson(this, jsonObject, "tutorial_img1");
   }
 }
