@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +17,7 @@ import java.util.List;
 
 public class GamePlayActivity extends AppCompatActivity {
 
+  ImageButton homeButton;
   RecyclerView smallScaleGameRecyclerViewclerView;
   List<GameItem> games;
 
@@ -30,6 +32,9 @@ public class GamePlayActivity extends AppCompatActivity {
     games.add(new GameItem("level21", R.raw.level12));
     setContentView(R.layout.activity_game_play);
     createRecyclerView();
+
+    homeButton = findViewById(R.id.homeButton);
+    homeButton.setOnClickListener(v -> backHome());
   }
 
   public void createRecyclerView() {
@@ -39,6 +44,11 @@ public class GamePlayActivity extends AppCompatActivity {
     smallScaleGameRecyclerViewclerView.setHasFixedSize(true);
     RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 2);
     smallScaleGameRecyclerViewclerView.setLayoutManager(layoutManager);
+  }
+
+  private void backHome() {
+    Intent intent = new Intent(this, MainActivity.class);
+    startActivity(intent);
   }
 }
 
@@ -85,4 +95,5 @@ class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder> {
       gameName = itemView.findViewById(R.id.name);
     }
   }
+
 }
