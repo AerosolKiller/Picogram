@@ -7,6 +7,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -173,8 +175,9 @@ public class NonogramUtils {
     int[][] solution = game.getSolution();
     int targetSize = 100;
     int ratio = Math.max(1, Math.min(targetSize / game.getWidth(), targetSize / game.getHeight()));
-    Bitmap bitmap = Bitmap.createBitmap(
-        game.getWidth() * ratio, game.getHeight() * ratio, Bitmap.Config.ARGB_8888);
+    Bitmap bitmap =
+        Bitmap.createBitmap(
+            game.getWidth() * ratio, game.getHeight() * ratio, Bitmap.Config.ARGB_8888);
     Canvas canvas = new Canvas(bitmap);
     Paint paint = new Paint();
     paint.setColor(Color.BLACK);
@@ -187,5 +190,20 @@ public class NonogramUtils {
       }
     }
     return bitmap;
+  }
+
+  public static void savaJson(Context context, JSONObject jsonObject, String fileName) {
+    // Save json file
+    try {
+      File file = new File(context.getExternalFilesDir(null), fileName + ".json");
+      if (!file.exists()) {
+        file.createNewFile();
+      }
+      FileOutputStream fileOutputStream = new FileOutputStream(file);
+      fileOutputStream.write(jsonObject.toString().getBytes());
+      fileOutputStream.close();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 }
