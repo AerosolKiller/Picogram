@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -206,5 +207,22 @@ public class NonogramUtils {
     } catch (Exception e) {
       e.printStackTrace();
     }
+  }
+
+  // 转换int[][] 到 List<List<Integer>>
+  public static List<List<Integer>> convertArrayToList(int[][] array) {
+    return Arrays.stream(array)
+        .map(row -> Arrays.stream(row)
+                .boxed()
+                .collect(Collectors.toList()))
+        .collect(Collectors.toList());
+  }
+
+  // 反转
+  public static int[][] convertListToArray(List<List<Integer>> list) {
+    return list.stream()
+            .map(row -> row.stream()
+                    .mapToInt(Integer::intValue).toArray())
+            .toArray(int[][]::new);
   }
 }

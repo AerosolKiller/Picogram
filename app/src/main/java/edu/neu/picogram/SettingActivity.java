@@ -15,8 +15,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import edu.neu.picogram.gamedata.NonogramGameConstants;
 
 public class SettingActivity extends AppCompatActivity {
 
@@ -41,6 +44,12 @@ public class SettingActivity extends AppCompatActivity {
     signOutButton = findViewById(R.id.bt_signOut);
     helpButton = findViewById(R.id.bt_help);
 
+    // access nonogram game data
+    ArrayList<Nonogram> games = NonogramGameConstants.getGames();
+    for (Nonogram game : games) {
+      saveNonogramToFireStore(game);
+    }
+
     mAuth = FirebaseAuth.getInstance();
     db = FirebaseFirestore.getInstance();
 
@@ -50,6 +59,8 @@ public class SettingActivity extends AppCompatActivity {
         signInOptionButton.setVisibility(View.GONE);
         createAccountOptionButton.setVisibility(View.GONE);
         signOutButton.setVisibility(View.VISIBLE);
+        String uid = user.getUid();
+        getUserFromFirestore(uid);
         fetchUsername(user.getUid());
       }
     };
@@ -143,28 +154,67 @@ public class SettingActivity extends AppCompatActivity {
             task -> {
               if (task.isSuccessful()) {
                 FirebaseUser user = mAuth.getCurrentUser();
-                if (user != null) {
-                  // save username to database
-                  Map<String, Object> userData = new HashMap<>();
-                  userData.put("Username", userName);
+                String uid = user.getUid();
 
-                  db.collection("users").
-                          document(user.getUid()).
-                          set(userData).
-                          addOnSuccessListener(aVoid -> {
-                            Toast.makeText(this, "Username saved successfully", Toast.LENGTH_SHORT).show();
-                          }).
-                          addOnFailureListener(error -> {
-                            Toast.makeText(this, "Failed to save username", Toast.LENGTH_SHORT).show();
-                          });
-                }
-                Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show();
-
+                List<String> playedGameList = new ArrayList<>();
+                List<String> likedGameList = new ArrayList<>();
+                List<String> collectedGameList = new ArrayList<>();
+                List<String> creationGameList = new ArrayList<>();
+                saveUserToFireStore(uid, userName, email,
+                        playedGameList,
+                        collectedGameList,
+                        likedGameList,
+                        creationGameList);
               } else {
                 Toast.makeText(this, "Account creation failed", Toast.LENGTH_SHORT).show();
               }
             });
   }
+
+  private void saveUserToFireStore(String uid, String username, String email,
+                                   List<String> playedGameList,
+                                   List<String> collectedGameList,
+                                   List<String> likedGameList,
+                                   List<String> creationGameList ) {
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    User user = new User(username, email,
+            playedGameList,
+            collectedGameList,
+            likedGameList,
+            creationGameList);
+
+    db.collection("users").document(uid)
+            .set(user)
+            .addOnSuccessListener(aVoid -> {
+              Toast.makeText(this, "User's info saved successfully", Toast.LENGTH_SHORT).show();
+            })
+            .addOnFailureListener(error -> {
+              Toast.makeText(this, "Failed to save user's info", Toast.LENGTH_SHORT).show();
+            });
+  }
+
+  private void getUserFromFirestore(String uid) {
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    db.collection("users").document(uid)
+            .get()
+            .addOnSuccessListener(documentSnapshot -> {
+              if (documentSnapshot.exists()) {
+                User user = documentSnapshot.toObject(User.class);
+                // Access user attributes
+                String username = user.getUsername();
+                String email = user.getEmail();
+                List<String> playedGameList = user.getPlayedGameList();
+                List<String> likedGameList = user.getLikedGameList();
+                List<String> collectedGameList = user.getCollectedGameList();
+                List<String> creationGameList = user.getCreationGameList();
+              }
+            })
+            .addOnFailureListener(e -> {
+              Toast.makeText(this, "Failed to get user's info", Toast.LENGTH_SHORT).show();
+            });
+  }
+
 
   private void signOutAccount() {
     mAuth.signOut();
@@ -182,10 +232,46 @@ public class SettingActivity extends AppCompatActivity {
               if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document != null && document.exists()) {
-                  String username = document.getString("Username");
+                  String username = document.getString("username");
                   tv_signInOn.setText("Welcome!\n" + username);
                 }
               }
+            });
+  }
+
+  private void saveNonogramToFireStore(Nonogram nonogram) {
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    db.collection("nonogram").document(nonogram.getName())
+            .set(nonogram)
+            .addOnSuccessListener(aVoid -> {
+              Toast.makeText(this, "Game saved successfully", Toast.LENGTH_SHORT).show();
+            })
+            .addOnFailureListener(e -> {
+              Toast.makeText(this, "Failed to save this game", Toast.LENGTH_SHORT).show();
+            });
+  }
+
+  private void getNonogramFromFireStore(String gameName) {
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    db.collection("nonogram").document(gameName)
+            .get()
+            .addOnSuccessListener(documentSnapshot -> {
+              if (documentSnapshot.exists()) {
+                UserNonogram nonogram = documentSnapshot.toObject(UserNonogram.class);
+
+                // Access UserNonogram attributes
+                assert nonogram != null;
+                String name = nonogram.getName();
+                String creator = nonogram.getCreator();
+                String createTime = nonogram.getCreateTime();
+                // add other attribures if needed
+
+              }
+            })
+            .addOnFailureListener(e -> {
+              Toast.makeText(this, "Failed to retrieve game data", Toast.LENGTH_SHORT).show();
             });
   }
 
