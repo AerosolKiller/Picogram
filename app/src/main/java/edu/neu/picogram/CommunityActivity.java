@@ -31,6 +31,8 @@ public class CommunityActivity extends AppCompatActivity {
 
   private Button favoriteButton;
 
+
+
   RecyclerView recyclerView;
 
   public List<Nonogram> nonogramList;
@@ -45,6 +47,7 @@ public class CommunityActivity extends AppCompatActivity {
     popularButton = findViewById(R.id.popular);
     newestButton = findViewById(R.id.newest);
     favoriteButton = findViewById(R.id.favorite);
+
 
     // 找到控件recyclerview
     recyclerView = findViewById(R.id.recyclerView);

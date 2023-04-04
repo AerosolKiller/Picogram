@@ -24,31 +24,21 @@
         android:layout_centerHorizontal="true"
         />
 
+    <Button
+        android:id="@+id/btn_getPhoto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_takephoto"
+        android:text="Get Photo from Gallery"
+        android:layout_centerHorizontal="true"
+        />
+
     <ImageView
         android:id="@+id/imageView1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/btn_takephoto"
+        android:layout_below="@+id/btn_getPhoto"
         />
-
-
-
-
-
-        <SurfaceView
-            android:id="@+id/surfaceView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <ImageButton
-            android:id="@+id/captureButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@android:drawable/ic_menu_camera"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="16dp" />
-
 
 
 
