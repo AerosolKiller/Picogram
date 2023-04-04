@@ -1,5 +1,7 @@
 package edu.neu.picogram;
 
+import java.util.List;
+
 public class Nonogram {
   protected String name;
   protected int width;
@@ -100,4 +102,14 @@ public class Nonogram {
   public String getName() {
     return name;
   }
+
+//  public SerializableNonogram toSerializableNonogram() {
+//    List<List<Integer>> rowCluesList = NonogramUtils.convertArrayToList(rowClues);
+//    List<List<Integer>> colCluesList = NonogramUtils.convertArrayToList(colClues);
+//    List<List<Integer>> solutionList = NonogramUtils.convertArrayToList(solution);
+//
+//    return new SerializableNonogram(name, width, height,
+//            rowCluesList, colCluesList, solutionList, );
+//  }
+
 }

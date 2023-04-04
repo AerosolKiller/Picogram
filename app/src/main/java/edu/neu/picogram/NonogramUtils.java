@@ -6,6 +6,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
+import android.widget.Toast;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -209,20 +212,122 @@ public class NonogramUtils {
     }
   }
 
-  // 转换int[][] 到 List<List<Integer>>
-  public static List<List<Integer>> convertArrayToList(int[][] array) {
-    return Arrays.stream(array)
-        .map(row -> Arrays.stream(row)
-                .boxed()
-                .collect(Collectors.toList()))
-        .collect(Collectors.toList());
+  // 转换int[][] 到 String
+  public static String convertArrayToString(int[][] array) {
+    StringBuilder stringBuilder = new StringBuilder();
+
+    for (int i = 0; i < array.length; i++) {
+      for (int j = 0; j < array[i].length; j++) {
+        stringBuilder.append(array[i][j]);
+        if (j < array[i].length - 1) {
+          stringBuilder.append(", ");
+        }
+      }
+      if (i < array.length - 1) {
+        stringBuilder.append("; ");
+      }
+    }
+    return stringBuilder.toString();
   }
 
-  // 反转
-  public static int[][] convertListToArray(List<List<Integer>> list) {
-    return list.stream()
-            .map(row -> row.stream()
-                    .mapToInt(Integer::intValue).toArray())
-            .toArray(int[][]::new);
+  // 转换strings 到 2d array
+  public static int[][] convertStringToArray(String string, int rows, int cols) {
+    String[] rowStrings = string.split("; ");
+    int[][] array = new int[rows][cols];
+
+    for (int i = 0; i < rowStrings.length; i++) {
+      String[] colStrings = rowStrings[i].split(", ");
+      for (int j = 0; j < colStrings.length; j++) {
+        array[i][j] = Integer.parseInt(colStrings[j]);
+      }
+    }
+    return array;
+  }
+
+  public static void saveNonogramToFireStore(String name,
+                                             int width,
+                                             int height,
+                                             String rowClues,
+                                             String colClues,
+                                             String solution,
+                                             String creator,
+                                             int likedNum,
+                                             String createTime
+                                             ) {
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    SerializableNonogram serializableGame = new SerializableNonogram(name,
+            width,
+            height,
+            rowClues,
+            colClues,
+            solution,
+            creator,
+            likedNum,
+            createTime);
+
+    db.collection("games").document(name)
+            .set(serializableGame)
+            .addOnSuccessListener(aVoid -> {
+              Log.d("Firestore", "Nonogram saved successfully");
+            })
+            .addOnFailureListener(e -> {
+              Log.w("Firestore", "Error saving nonogram", e);
+            });
+  }
+
+  public static void getNonogramFromFireStore(String gameName) {
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    db.collection("nonogram").document(gameName)
+            .get()
+            .addOnSuccessListener(documentSnapshot -> {
+              if (documentSnapshot.exists()) {
+                UserNonogram nonogram = documentSnapshot.toObject(UserNonogram.class);
+
+                // Access UserNonogram attributes
+                assert nonogram != null;
+                String name = nonogram.getName();
+                String creator = nonogram.getCreator();
+                String createTime = nonogram.getCreateTime();
+                // add other attribures if needed
+
+              }
+            })
+            .addOnFailureListener(e -> {
+              Log.w("Firestore", "Error getting nonogram", e);
+            });
+  }
+
+  public static void addPlayedGameToUser(String userId, String gameId) {
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    db.collection("users")
+        .document(userId)
+        .update("playedGame", FieldValue.arrayUnion(gameId))
+        .addOnSuccessListener(
+            aVoid -> {
+              Log.d("Firestore", "Played game added successfully");
+            })
+        .addOnFailureListener(
+            e -> {
+              Log.w("Firestore", "Error adding played game", e);
+            });
+  }
+
+  public static void saveGameHelper(UserNonogram game) {
+    String rowCluesList = NonogramUtils.convertArrayToString(game.getRowClues());
+    String colCluesList = NonogramUtils.convertArrayToString(game.getColClues());
+    String solutionList = NonogramUtils.convertArrayToString(game.getSolution());
+
+    NonogramUtils.saveNonogramToFireStore(game.getName(),
+            game.getWidth(),
+            game.getHeight(),
+            rowCluesList,
+            colCluesList,
+            solutionList,
+            game.getCreator(),
+            game.getLikedNum(),
+            game.getCreateTime()
+    );
   }
 }

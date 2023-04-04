@@ -44,12 +44,6 @@ public class SettingActivity extends AppCompatActivity {
     signOutButton = findViewById(R.id.bt_signOut);
     helpButton = findViewById(R.id.bt_help);
 
-    // access nonogram game data
-    ArrayList<Nonogram> games = NonogramGameConstants.getGames();
-    for (Nonogram game : games) {
-      saveNonogramToFireStore(game);
-    }
-
     mAuth = FirebaseAuth.getInstance();
     db = FirebaseFirestore.getInstance();
 
