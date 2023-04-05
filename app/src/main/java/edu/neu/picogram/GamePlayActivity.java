@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -27,6 +28,12 @@ public class GamePlayActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     games = getGames();
     setContentView(R.layout.activity_game_play);
+    Button button = findViewById(R.id.largeScaleGameButton);
+    button.setOnClickListener(
+        v -> {
+          Intent intent = new Intent(this, BigScaleGameActivity.class);
+          startActivity(intent);
+        });
     createRecyclerView();
   }
 
@@ -65,6 +72,7 @@ class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder> {
     holder.itemView.setOnClickListener(
         v -> {
           Intent intent = new Intent(context, GameActivity.class);
+          intent.putExtra("mode", "small");
           intent.putExtra("index", position);
           context.startActivity(intent);
         });

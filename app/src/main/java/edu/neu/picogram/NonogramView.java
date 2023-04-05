@@ -47,6 +47,8 @@ public class NonogramView extends View {
 
     solutionPaint = new Paint();
     solutionPaint.setColor(Color.BLUE);
+    // 初始化一个空的nonogram对象，防止空指针异常，方便预览
+    game = new Nonogram("", 5, 5, new int[5][], new int[5][], new int[5][5]);
   }
 
   @Override
@@ -100,6 +102,7 @@ public class NonogramView extends View {
         // 如果当前需要显示提示，并且当前格子没有被选中，绘制一个蓝色的格子
         else if (showSolution && game.getSolution(row, col) == 1) {
           drawHints(canvas, row, col);
+          showSolution = false;
         }
       }
     }
@@ -183,6 +186,7 @@ public class NonogramView extends View {
   @Override
   public boolean onTouchEvent(MotionEvent event) {
     performClick();
+    this.setShowSolution(false);
     int action = event.getAction();
     // 可以是按下当前格子，或者从其他格子滑动过来
     boolean isTouchDown = (action == MotionEvent.ACTION_DOWN);

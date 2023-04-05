@@ -1,7 +1,5 @@
 package edu.neu.picogram;
 
-import java.util.List;
-
 public class Nonogram {
   protected String name;
   protected int width;
@@ -41,7 +39,16 @@ public class Nonogram {
     return currentGrid;
   }
 
-  public void setCurrentGrid(int[][] currentGrid) {
+  public Nonogram(
+      String name,
+      int width,
+      int height,
+      int[][] rowClues,
+      int[][] colClues,
+      int[][] solution,
+      int[][] currentGrid) {
+    // 初始化游戏，储存游戏的宽高，行列提示，解，以及当前游戏的状态
+    this(name, width, height, rowClues, colClues, solution);
     this.currentGrid = currentGrid;
   }
 
@@ -123,13 +130,17 @@ public class Nonogram {
     return name;
   }
 
-//  public SerializableNonogram toSerializableNonogram() {
-//    List<List<Integer>> rowCluesList = NonogramUtils.convertArrayToList(rowClues);
-//    List<List<Integer>> colCluesList = NonogramUtils.convertArrayToList(colClues);
-//    List<List<Integer>> solutionList = NonogramUtils.convertArrayToList(solution);
-//
-//    return new SerializableNonogram(name, width, height,
-//            rowCluesList, colCluesList, solutionList, );
-//  }
+  public void setCurrentGrid(int[][] currentGrid) {
+    this.currentGrid = currentGrid;
+  }
+
+  //  public SerializableNonogram toSerializableNonogram() {
+  //    List<List<Integer>> rowCluesList = NonogramUtils.convertArrayToList(rowClues);
+  //    List<List<Integer>> colCluesList = NonogramUtils.convertArrayToList(colClues);
+  //    List<List<Integer>> solutionList = NonogramUtils.convertArrayToList(solution);
+  //
+  //    return new SerializableNonogram(name, width, height,
+  //            rowCluesList, colCluesList, solutionList, );
+  //  }
 
 }

@@ -184,10 +184,13 @@ public class NonogramUtils {
     return list.stream().mapToInt(Integer::intValue).toArray();
   }
 
-  public static Bitmap drawNonogram(Nonogram game) {
+  public static Bitmap drawNonogram(Nonogram game, int... targetSize) {
     int[][] solution = game.getSolution();
-    int targetSize = 100;
-    int ratio = Math.max(1, Math.min(targetSize / game.getWidth(), targetSize / game.getHeight()));
+    int size = 100;
+    if (targetSize.length != 0) {
+      size = targetSize[0];
+    }
+    int ratio = Math.max(1, Math.min(size / game.getWidth(), size / game.getHeight()));
     Bitmap bitmap =
         Bitmap.createBitmap(
             game.getWidth() * ratio, game.getHeight() * ratio, Bitmap.Config.ARGB_8888);
@@ -211,7 +214,10 @@ public class NonogramUtils {
     try {
       File file = new File(context.getExternalFilesDir(null), fileName + ".json");
       if (!file.exists()) {
-        file.createNewFile();
+        boolean success = file.createNewFile();
+        if (!success) {
+          return;
+        }
       }
       FileOutputStream fileOutputStream = new FileOutputStream(file);
       fileOutputStream.write(jsonObject.toString().getBytes());
@@ -280,9 +286,11 @@ public class NonogramUtils {
     db.collection("games").document(gameId)
             .set(serializableGame)
             .addOnSuccessListener(aVoid -> {
+
               Log.d("Firestore", "Nonogram saved successfully");
             })
-            .addOnFailureListener(e -> {
+        .addOnFailureListener(
+            e -> {
               Log.w("Firestore", "Error saving nonogram", e);
             });
   }
@@ -291,9 +299,11 @@ public class NonogramUtils {
     //获取数据库信息
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    db.collection("nonogram").document(gameName)
-            .get()
-            .addOnSuccessListener(documentSnapshot -> {
+    db.collection("nonogram")
+        .document(gameName)
+        .get()
+        .addOnSuccessListener(
+            documentSnapshot -> {
               if (documentSnapshot.exists()) {
                 UserNonogram nonogram = documentSnapshot.toObject(UserNonogram.class);
 
@@ -307,7 +317,8 @@ public class NonogramUtils {
 
               }
             })
-            .addOnFailureListener(e -> {
+        .addOnFailureListener(
+            e -> {
               Log.w("Firestore", "Error getting nonogram", e);
             });
   }

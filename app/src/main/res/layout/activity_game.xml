@@ -6,6 +6,16 @@
     android:layout_height="match_parent"
     tools:context=".GameActivity">
 
+    <Chronometer
+        android:id="@+id/chronometer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="60dp"
+        app:layout_constraintBottom_toTopOf="@+id/nonogramView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <edu.neu.picogram.NonogramView
         android:id="@+id/nonogramView"
         android:layout_width="0dp"
@@ -32,19 +42,38 @@
         android:layout_height="wrap_content"
         android:text="Check"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/hint"
+        app:layout_constraintEnd_toStartOf="@+id/hintFrame"
         app:layout_constraintStart_toEndOf="@+id/mode"
         app:layout_constraintTop_toBottomOf="@+id/nonogramView" />
 
-    <CheckBox
-        android:id="@+id/hint"
+    <FrameLayout
+        android:id="@+id/hintFrame"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hint"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/checkAnswer"
-        app:layout_constraintTop_toBottomOf="@+id/nonogramView" />
+        app:layout_constraintTop_toBottomOf="@+id/nonogramView">
+
+        <Button
+            android:id="@+id/hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hint" />
+
+        <TextView
+            android:id="@+id/badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:layout_marginEnd="-10dp"
+            android:layout_marginTop="-10dp"
+            android:background="@drawable/badge_background"
+            android:padding="4dp"
+            android:text="3"
+            android:textColor="#ffffff"
+            android:textSize="12sp" />
+    </FrameLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
