@@ -26,7 +26,7 @@ public class SettingActivity extends AppCompatActivity {
   private FirebaseAuth mAuth;
   private FirebaseAuth.AuthStateListener mAuthStateListener;
   private Button signInOptionButton, createAccountOptionButton,
-          signOutButton, helpButton, notificationButton;
+          signOutButton, helpButton;
   private ImageButton homeButton;
   private FirebaseFirestore db;
 

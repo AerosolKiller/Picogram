@@ -6,17 +6,19 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
-import android.widget.Toast;
+import com.google.android.gms.tasks.OnSuccessListener;import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.time.Instant;import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicReference;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -245,6 +247,7 @@ public class NonogramUtils {
   }
 
   public static void saveNonogramToFireStore(String name,
+                                             String gameId,
                                              int width,
                                              int height,
                                              String rowClues,
@@ -257,6 +260,7 @@ public class NonogramUtils {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     SerializableNonogram serializableGame = new SerializableNonogram(name,
+            gameId,
             width,
             height,
             rowClues,
@@ -266,7 +270,7 @@ public class NonogramUtils {
             likedNum,
             createTime);
 
-    db.collection("games").document(name)
+    db.collection("games").document(gameId)
             .set(serializableGame)
             .addOnSuccessListener(aVoid -> {
               Log.d("Firestore", "Nonogram saved successfully");
@@ -320,6 +324,7 @@ public class NonogramUtils {
     String solutionList = NonogramUtils.convertArrayToString(game.getSolution());
 
     NonogramUtils.saveNonogramToFireStore(game.getName(),
+            game.getGameId(),
             game.getWidth(),
             game.getHeight(),
             rowCluesList,
@@ -329,5 +334,54 @@ public class NonogramUtils {
             game.getLikedNum(),
             game.getCreateTime()
     );
+  }
+  public static void saveCreator(String userName, String gameId) {
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    db.collection("games")
+            .document(gameId)
+            .update("creator", userName)
+            .addOnSuccessListener(
+                    aVoid -> {
+                      Log.d("FireStore", "creator saved successfully");
+                    })
+            .addOnFailureListener(
+                    e -> {
+                      Log.w("Firestore", "Error saveing creator name", e);
+                    });
+  }
+
+  public static String generateGameName(String prefix) {
+    Instant instant = Instant.now();
+    DateTimeFormatter formatter =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneId.of("UTC"));
+    String timeStamp = formatter.format(instant);
+    return prefix + timeStamp;
+  }
+
+  // , OnSuccessListener<String> sListener
+  public static void fetchUserName(String uid, OnUsernameFetchedListener listener) {
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    db.collection("users")
+        .document(uid)
+        .get()
+        .addOnCompleteListener(
+            task -> {
+              if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document != null && document.exists()) {
+                  String username = document.getString("username");
+                  listener.onUsernameFetched(username);
+                  //sListener.onSuccess(s);
+                } else {
+                  System.err.println("User document not found");
+                }
+              } else {
+                System.err.println("Error fetching username: " + task.getException().getMessage());
+              }
+            });
+  }
+
+  public interface OnUsernameFetchedListener {
+    void onUsernameFetched(String username);
   }
 }
