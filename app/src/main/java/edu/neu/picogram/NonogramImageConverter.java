@@ -19,6 +19,14 @@ public class NonogramImageConverter {
     return binaryMatrix;
   }
 
+  public static boolean[][] convertToNonogramMatrix(Bitmap bitmap, int targetSize) {
+    Bitmap grayscaleBitmap = convertToGrayscale(bitmap);
+    Bitmap resizedBitmap = resizeAndCropImage(grayscaleBitmap, targetSize);
+    Bitmap edgeBitmap = detectEdges(resizedBitmap);
+    boolean[][] binaryMatrix = imageToBinaryMatrix(edgeBitmap);
+    return binaryMatrix;
+  }
+
   public static boolean[][] convertToNonogramMatrix(
       Context context, int resources, int targetSize) {
     Bitmap originalBitmap = BitmapFactory.decodeResource(context.getResources(), resources);

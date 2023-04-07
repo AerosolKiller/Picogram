@@ -8,6 +8,7 @@
     tools:context=".TakePhotoActivity">
 
 
+
     <TextView
         android:id="@+id/text"
         android:layout_width="wrap_content"
@@ -35,11 +36,19 @@
 
     <ImageView
         android:id="@+id/imageView1"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="400dp"
+        android:layout_height="400dp"
         android:layout_below="@+id/btn_getPhoto"
         />
 
+    <Button
+        android:id="@+id/btn_transformPhoto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="Transform Photo to game"
+        />
 
 
 </RelativeLayout>
