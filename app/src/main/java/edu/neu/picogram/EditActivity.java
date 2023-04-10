@@ -1,12 +1,25 @@
 package edu.neu.picogram;
 
-import static edu.neu.picogram.NonogramUtils.fetchUserName;
-import static edu.neu.picogram.NonogramUtils.generateGameName;
+import static android.content.ContentValues.TAG;
+import static edu.neu.picogram.NonogramUtils.addGameToUserCreatedGames;
+import static edu.neu.picogram.NonogramUtils.convertArrayToString;
+import static edu.neu.picogram.NonogramUtils.fetchUsername;
 import static edu.neu.picogram.NonogramUtils.saveGame;
+import static edu.neu.picogram.NonogramUtils.saveNonogramToFireStore;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
+import android.text.InputType;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -18,14 +31,22 @@ public class EditActivity extends AppCompatActivity {
   private int[][] colClues;
   private int[][] rowClues;
   private int[][] solution;
+  String colString;
+  String rowString;
+  String solutionString;
 
   private String creator;
   private String createTime;
-  private String gameName;
+  private String gameName = "";
   private int width = 0;
   private int height = 0;
   private int likedNum = 0;
+  UserNonogram createdGame;
   private FirebaseAuth.AuthStateListener mAuthStateListener;
+
+  TextInputEditText inputGameName;
+  Button saveNameButton;
+  Button cancelButton;
 
 
   @Override
@@ -34,17 +55,25 @@ public class EditActivity extends AppCompatActivity {
     setContentView(R.layout.activity_edit);
     // access database
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+    FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
-    // find user
+
     mAuthStateListener = firebaseAuth -> {
         FirebaseUser user = firebaseAuth.getCurrentUser();
         if (user != null) {
             String uid = user.getUid();
-            // update creator in database
-            //fetchUserName(uid, );
-        }
-    };
-
+            fetchUsername(uid)
+                    .thenAccept(username -> {
+                        Log.d(TAG, "Fetched username: " + username);
+                        creator = username;
+                    })
+                    .exceptionally(throwable -> {
+                        Log.e(TAG, "Error fetching username: " + throwable.getMessage());
+                        return null;
+                    });
+          }
+      };
+    mAuth.addAuthStateListener(mAuthStateListener);
     NonogramView nonogramView = findViewById(R.id.nonogramView);
     nonogramView.setEditMode(true);
     // 创建一个全0的5*5的游戏，作为初始状态，传入NonogramEditView
@@ -59,22 +88,32 @@ public class EditActivity extends AppCompatActivity {
     Button button = findViewById(R.id.saveAnswer);
     button.setOnClickListener(
         v -> {
-          // create time
-          Instant instant = Instant.now();
-          DateTimeFormatter formatter =
-                  DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneId.of("UTC"));
-          createTime = formatter.format(instant);
-
-          // create unique game name based on time stamp
-          String gameName = generateGameName("Game_");
-
-
-          // save game data
-          Nonogram newGame = nonogramView.getGame();
-          saveGame(gameName, newGame.getRowClues(), newGame.getColClues(), newGame.getSolution());
-
-          //UserNonogram createdGame = new UserNonogram();
-
+            // save game data
+            Nonogram newGame = nonogramView.getGame();
+            if (newGame != null) {
+                rowClues = newGame.getRowClues();
+                rowString = convertArrayToString(rowClues);
+                colClues = newGame.getColClues();
+                colString = convertArrayToString(colClues);
+                solution = newGame.getSolution();
+                solutionString = convertArrayToString(solution);
+                saveGame(gameName, rowClues, colClues, solution);
+                width = newGame.getWidth();
+                height = newGame.getHeight();
+                // create time
+                Instant instant = Instant.now();
+                DateTimeFormatter formatter =
+                        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneId.of("UTC"));
+                createTime = formatter.format(instant);
+                createdGame = new UserNonogram(gameName, creator, likedNum, createTime,
+                        width,
+                        height,
+                        rowClues,
+                        colClues,
+                        solution);
+                showSaveGameDialog();
+                //UserNonogram createdGame = new UserNonogram();
+            }
         });
 
     //    boolean[][] solution = convertToNonogramMatrix(this, R.drawable.tutorial_img1, 200);
@@ -94,4 +133,45 @@ public class EditActivity extends AppCompatActivity {
     //    }
     //    savaJson(this, jsonObject, "tutorial_img1");
   }
+        // create a dialog so users can edit their own game name
+  private void showSaveGameDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        // Inflate the dialog layout
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.saveeditgame, null);
+
+        // Find the input field and buttons in the dialog layout
+        inputGameName = dialogView.findViewById(R.id.gameName_edit_text);
+        saveNameButton = dialogView.findViewById(R.id.save_name_button);
+        cancelButton = dialogView.findViewById(R.id.cancel_button);
+
+        // Create the dialog
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        // Set up click listeners for the buttons
+        saveNameButton.setOnClickListener(v -> {
+            // catch game name input
+            createdGame.setName(inputGameName.getText().toString());
+            saveNonogramToFireStore(createdGame.getName(),
+                    createdGame.getGameId(),
+                    createdGame.getWidth(),
+                    createdGame.getHeight(),
+                    rowString,
+                    colString,
+                    solutionString,
+                    createdGame.getCreator(),
+                    createdGame.getLikedNum(),
+                    createdGame.getCreateTime());
+            addGameToUserCreatedGames(createdGame.getGameId());
+            dialog.dismiss();
+        });
+
+        // cancel button
+        cancelButton.setOnClickListener(v -> dialog.dismiss());
+        // Show the dialog
+        dialog.show();
+    }
 }

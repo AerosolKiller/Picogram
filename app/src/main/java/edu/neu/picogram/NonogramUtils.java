@@ -1,12 +1,18 @@
 package edu.neu.picogram;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
-import com.google.android.gms.tasks.OnSuccessListener;import com.google.firebase.firestore.DocumentSnapshot;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.io.ByteArrayOutputStream;
@@ -18,6 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -281,6 +288,7 @@ public class NonogramUtils {
   }
 
   public static void getNonogramFromFireStore(String gameName) {
+    //获取数据库信息
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     db.collection("nonogram").document(gameName)
@@ -295,6 +303,7 @@ public class NonogramUtils {
                 String creator = nonogram.getCreator();
                 String createTime = nonogram.getCreateTime();
                 // add other attribures if needed
+                //String rowClue = nonogram.getRowClues();
 
               }
             })
@@ -303,11 +312,11 @@ public class NonogramUtils {
             });
   }
 
-  public static void addPlayedGameToUser(String userId, String gameId) {
+  public static void addPlayedSmallGameToUser(String userId, String gameId) {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     db.collection("users")
         .document(userId)
-        .update("playedGame", FieldValue.arrayUnion(gameId))
+        .update("playedSmallGameList", FieldValue.arrayUnion(gameId))
         .addOnSuccessListener(
             aVoid -> {
               Log.d("Firestore", "Played game added successfully");
@@ -316,6 +325,21 @@ public class NonogramUtils {
             e -> {
               Log.w("Firestore", "Error adding played game", e);
             });
+  }
+
+  public static void addGameToUserCreatedGames(String gameId) {
+    FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+    if (currentUser != null) {
+      String userId = currentUser.getUid();
+      FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+      DocumentReference userRef = db.collection("users").document(userId);
+      userRef.update("creationGameList", FieldValue.arrayUnion(gameId))
+              .addOnSuccessListener(aVoid ->
+                      Log.d(TAG, "Successfully added gameId to user's createdGames"))
+              .addOnFailureListener(e ->
+                      Log.e(TAG, "Failed to add gameId to user's createdGames", e));
+    }
   }
 
   public static void saveGameHelper(UserNonogram game) {
@@ -359,29 +383,27 @@ public class NonogramUtils {
   }
 
   // , OnSuccessListener<String> sListener
-  public static void fetchUserName(String uid, OnUsernameFetchedListener listener) {
+  public static CompletableFuture<String> fetchUsername(String userId) {
+    CompletableFuture<String> completableFuture = new CompletableFuture<>();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+
     db.collection("users")
-        .document(uid)
-        .get()
-        .addOnCompleteListener(
-            task -> {
+            .document(userId)
+            .get()
+            .addOnCompleteListener(task -> {
               if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
-                if (document != null && document.exists()) {
+                if (document.exists()) {
                   String username = document.getString("username");
-                  listener.onUsernameFetched(username);
-                  //sListener.onSuccess(s);
+                  completableFuture.complete(username);
                 } else {
-                  System.err.println("User document not found");
+                  completableFuture.completeExceptionally(new Exception("User document not found"));
                 }
               } else {
-                System.err.println("Error fetching username: " + task.getException().getMessage());
+                completableFuture.completeExceptionally(task.getException());
               }
             });
-  }
 
-  public interface OnUsernameFetchedListener {
-    void onUsernameFetched(String username);
+    return completableFuture;
   }
 }

@@ -6,7 +6,8 @@ import java.util.List;
 public class User {
     private String username;
     private String email;
-    private List<String> playedGameList;
+    private List<String> playedSmallGameList;
+    private List<String> playedLargeGameList;
     private List<String> collectedGameList;
     private List<String> likedGameList;
     private List<String> creationGameList;
@@ -16,16 +17,34 @@ public class User {
     public User(
       String username,
       String email,
-      List<String> playedGameList,
+      List<String> playedSmallGameList,
+      List<String> playedLargeGameList,
       List<String> collectedGameList,
       List<String> likedGameList,
       List<String> creationGameList) {
         this.username = username;
         this.email = email;
-        this.playedGameList = playedGameList;
+        this.playedSmallGameList = playedSmallGameList;
+        this.playedLargeGameList = playedLargeGameList;
         this.collectedGameList = collectedGameList;
         this.likedGameList = likedGameList;
         this.creationGameList = creationGameList;
+    }
+
+    public List<String> getPlayedSmallGameList() {
+        return playedSmallGameList;
+    }
+
+    public void setPlayedSmallGameList(List<String> playedSmallGameList) {
+        this.playedSmallGameList = playedSmallGameList;
+    }
+
+    public List<String> getPlayedLargeGameList() {
+        return playedLargeGameList;
+    }
+
+    public void setPlayedLargeGameList(List<String> playedLargeGameList) {
+        this.playedLargeGameList = playedLargeGameList;
     }
 
     public String getUsername() {
@@ -36,20 +55,11 @@ public class User {
         this.username = username;
     }
 
-      public String getEmail() {
+    public String getEmail() {
         return email;
       }
-
       public void setEmail(String email) {
         this.email = email;
-      }
-
-      public List<String> getPlayedGameList() {
-        return playedGameList;
-      }
-
-      public void setPlayedGameList(List<String> playedGameList) {
-        this.playedGameList = playedGameList;
       }
 
       public List<String> getCollectedGameList() {

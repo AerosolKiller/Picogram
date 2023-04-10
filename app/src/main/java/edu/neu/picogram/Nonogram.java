@@ -25,6 +25,26 @@ public class Nonogram {
     this.currentGrid = new int[height][width];
   }
 
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void setWidth(int width) {
+    this.width = width;
+  }
+
+  public void setHeight(int height) {
+    this.height = height;
+  }
+
+  public int[][] getCurrentGrid() {
+    return currentGrid;
+  }
+
+  public void setCurrentGrid(int[][] currentGrid) {
+    this.currentGrid = currentGrid;
+  }
+
   public int getWidth() {
     return width;
   }

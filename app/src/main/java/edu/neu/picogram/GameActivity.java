@@ -1,6 +1,6 @@
 package edu.neu.picogram;
 
-import static edu.neu.picogram.NonogramUtils.addPlayedGameToUser;
+import static edu.neu.picogram.NonogramUtils.addPlayedSmallGameToUser;
 import static edu.neu.picogram.gamedata.NonogramGameConstants.getGame;
 import static edu.neu.picogram.gamedata.UserNonogramConstants.getUserGame;
 
@@ -39,7 +39,7 @@ public class GameActivity extends AppCompatActivity {
         v -> {
           boolean isSolved = nonogramView.getGame().isSolved();
           if (isSolved) {
-              addPlayedGameToUser(userId, games.getName());
+              addPlayedSmallGameToUser(userId, games.getName());
           }
           Toast.makeText(this, isSolved ? "Solved!" : "Not solved yet", Toast.LENGTH_SHORT).show();
         });

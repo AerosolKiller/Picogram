@@ -150,12 +150,14 @@ public class SettingActivity extends AppCompatActivity {
                 FirebaseUser user = mAuth.getCurrentUser();
                 String uid = user.getUid();
 
-                List<String> playedGameList = new ArrayList<>();
+                List<String> playedSmallGameList = new ArrayList<>();
+                List<String> playedLargeGameList = new ArrayList<>();
                 List<String> likedGameList = new ArrayList<>();
                 List<String> collectedGameList = new ArrayList<>();
                 List<String> creationGameList = new ArrayList<>();
                 saveUserToFireStore(uid, userName, email,
-                        playedGameList,
+                        playedSmallGameList,
+                        playedLargeGameList,
                         collectedGameList,
                         likedGameList,
                         creationGameList);
@@ -166,14 +168,16 @@ public class SettingActivity extends AppCompatActivity {
   }
 
   private void saveUserToFireStore(String uid, String username, String email,
-                                   List<String> playedGameList,
+                                   List<String> playedSmallGameList,
+                                   List<String> playedLargeGameList,
                                    List<String> collectedGameList,
                                    List<String> likedGameList,
                                    List<String> creationGameList ) {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     User user = new User(username, email,
-            playedGameList,
+            playedSmallGameList,
+            playedLargeGameList,
             collectedGameList,
             likedGameList,
             creationGameList);
@@ -198,7 +202,6 @@ public class SettingActivity extends AppCompatActivity {
                 // Access user attributes
                 String username = user.getUsername();
                 String email = user.getEmail();
-                List<String> playedGameList = user.getPlayedGameList();
                 List<String> likedGameList = user.getLikedGameList();
                 List<String> collectedGameList = user.getCollectedGameList();
                 List<String> creationGameList = user.getCreationGameList();
