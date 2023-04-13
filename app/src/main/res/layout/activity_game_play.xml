@@ -63,6 +63,15 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_bigScalePic"
         app:layout_constraintVertical_bias="0.846" />
 
+    <Button
+        android:id="@+id/largeScaleGameButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Large Scale Game"
+        app:layout_constraintTop_toBottomOf="@+id/tv_bigScalePic"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <ImageButton
         android:id="@+id/homeButton"
         android:layout_width="wrap_content"
