@@ -1,5 +1,7 @@
 package edu.neu.picogram;
 
+import androidx.annotation.NonNull;
+
 import java.util.UUID;
 
 public class UserNonogram extends Nonogram{
@@ -51,5 +53,14 @@ public class UserNonogram extends Nonogram{
         this.createTime = createTime;
     }
 
-
+    @NonNull
+    @Override
+    public String toString() {
+        return "UserNonogram{" +
+                "creator='" + creator + '\'' +
+                ", likedNum=" + likedNum +
+                ", gameId='" + gameId + '\'' +
+                ", createTime='" + createTime + '\'' +
+                '}';
+    }
 }

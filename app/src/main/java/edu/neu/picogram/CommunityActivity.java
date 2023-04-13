@@ -1,7 +1,7 @@
 package edu.neu.picogram;
 
 import static edu.neu.picogram.NonogramUtils.drawNonogram;
-import static edu.neu.picogram.gamedata.NonogramGameConstants.getGames;
+import static edu.neu.picogram.gamedata.UserNonogramConstants.getUserGames;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +21,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.stream.Collectors;
 
 public class CommunityActivity extends AppCompatActivity {
 
@@ -32,10 +33,9 @@ public class CommunityActivity extends AppCompatActivity {
   private Button favoriteButton;
 
 
-
   RecyclerView recyclerView;
 
-  public List<Nonogram> nonogramList;
+  public ArrayList<UserNonogram> nonogramList;
 
 
   @Override
@@ -69,14 +69,20 @@ public class CommunityActivity extends AppCompatActivity {
       public void onClick(View v) {
 
         //sortByPopularity(nonogramList);
+        adapter.sortByPopular();
+//        nonogramList = nonogramList.stream().sorted((a, b) -> b.getLikedNum() - a.getLikedNum()).collect(Collectors.toList());
+
+//        Log.d("TAG", nonogramList.toString());
+
       }
     });
 
     newestButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-
         //sortByNewest(nonogramList);
+        nonogramList.stream().sorted((a, b) -> b.getCreateTime().compareTo(a.getCreateTime()));
+        Log.d("TAG", nonogramList.toString());
       }
     });
 
@@ -87,12 +93,7 @@ public class CommunityActivity extends AppCompatActivity {
         //open the new activity of all favorite games
       }
     });
-
-
-
   }
-
-
 
   private void initData() {
     // List<Data> list ---> Apdater ---> setAdapter ---> 显示数据
@@ -101,7 +102,7 @@ public class CommunityActivity extends AppCompatActivity {
     // 创建模拟数据
 
       //创建数据对象；
-    nonogramList = getGames();
+    nonogramList = getUserGames();
 
 
     //创建适配器
@@ -114,12 +115,20 @@ public class CommunityActivity extends AppCompatActivity {
 class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder> {
 
   private Context context;
-  private List<Nonogram> nonogramList;
+  private ArrayList<UserNonogram> nonogramList;
 
-  public CommunityAdapter(Context context, List<Nonogram> nonogramList) {
+  public CommunityAdapter(Context context, ArrayList<UserNonogram> nonogramList) {
     this.context = context;
     this.nonogramList = nonogramList;
   }
+
+  // update the nonogram list
+  public void sortByPopular() {
+    this.nonogramList = (ArrayList<UserNonogram>) nonogramList.stream()
+            .sorted((a, b) -> b.getLikedNum() - a.getLikedNum())
+            .collect(Collectors.toList());
+  }
+
 
   @NonNull
   @Override
