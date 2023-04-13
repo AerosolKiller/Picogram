@@ -7,4 +7,5 @@
     <string name="take_a_photo">Take a photo</string>
     <string name="sign_out">Sign out</string>
     <string name="sign_in">Sign In</string>
+    <string name="text_label">Please login firstly!</string>
 </resources>

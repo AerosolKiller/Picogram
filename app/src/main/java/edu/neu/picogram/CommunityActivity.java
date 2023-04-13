@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +20,12 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -38,6 +45,11 @@ public class CommunityActivity extends AppCompatActivity {
   public ArrayList<UserNonogram> nonogramList;
 
 
+  private FirebaseAuth mAuth;
+  private FirebaseAuth.AuthStateListener mAuthStateListener;
+  FirebaseUser user;
+
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -47,6 +59,23 @@ public class CommunityActivity extends AppCompatActivity {
     popularButton = findViewById(R.id.popular);
     newestButton = findViewById(R.id.newest);
     favoriteButton = findViewById(R.id.favorite);
+
+    mAuth = FirebaseAuth.getInstance();
+
+
+    mAuthStateListener = firebaseAuth -> {
+      user = firebaseAuth.getCurrentUser();
+        if (user != null) {
+            // User is signed in
+            Log.d("TAG", "onAuthStateChanged:signed_in:" + user.getUid());
+        } else {
+            // User is signed out
+            Log.d("TAG", "onAuthStateChanged:signed_out");
+        }
+
+    };
+
+    mAuth.addAuthStateListener(mAuthStateListener);
 
 
     // 找到控件recyclerview
@@ -70,19 +99,19 @@ public class CommunityActivity extends AppCompatActivity {
 
         //sortByPopularity(nonogramList);
         adapter.sortByPopular();
-//        nonogramList = nonogramList.stream().sorted((a, b) -> b.getLikedNum() - a.getLikedNum()).collect(Collectors.toList());
-
-//        Log.d("TAG", nonogramList.toString());
+        //
+        adapter.notifyDataSetChanged();
 
       }
     });
 
+
     newestButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        //sortByNewest(nonogramList);
-        nonogramList.stream().sorted((a, b) -> b.getCreateTime().compareTo(a.getCreateTime()));
+        adapter.sortByNewest();
         Log.d("TAG", nonogramList.toString());
+        adapter.notifyDataSetChanged();
       }
     });
 
@@ -90,7 +119,17 @@ public class CommunityActivity extends AppCompatActivity {
       @Override
       public void onClick(View v) {
 
-        //open the new activity of all favorite games
+        // check if the user is not logged in, then jump to the login page
+        if (user == null) {
+          // User is signed out
+//          Toast.makeText(CommunityActivity.this, "Please login firstly.", Toast.LENGTH_SHORT).show();
+            // snack bar to pop up and ask the user to login
+          startSnackbar(v);
+        }
+        else {
+          // if the user is logged in, then list the favorite nonograms
+
+        }
       }
     });
   }
@@ -110,6 +149,19 @@ public class CommunityActivity extends AppCompatActivity {
     //设置到Recycler view里面去
     recyclerView.setAdapter(adapter);
   }
+
+
+  public void startSnackbar(View view) {
+    Snackbar.make(view, "Please Login Firstly.", Snackbar.LENGTH_LONG)
+            .setAction("Login", new View.OnClickListener() {
+              @Override
+              public void onClick(View view) {
+                Snackbar.make(view, "", Snackbar.LENGTH_LONG).show();
+                Intent intent = new Intent(CommunityActivity.this, SettingActivity.class);
+                startActivity(intent);
+              }
+            }).show();
+  }
 }
 
 class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder> {
@@ -122,12 +174,21 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
     this.nonogramList = nonogramList;
   }
 
-  // update the nonogram list
+  // update the nonogram list by popularity
   public void sortByPopular() {
     this.nonogramList = (ArrayList<UserNonogram>) nonogramList.stream()
             .sorted((a, b) -> b.getLikedNum() - a.getLikedNum())
             .collect(Collectors.toList());
+//    Log.d("TAG", nonogramList.toString());
   }
+
+  // update the nonogram list by newest
+    public void sortByNewest() {
+        this.nonogramList = (ArrayList<UserNonogram>) nonogramList.stream()
+                .sorted((a, b) -> b.getCreateTime().compareTo(a.getCreateTime()))
+                .collect(Collectors.toList());
+    }
+
 
 
   @NonNull
@@ -137,6 +198,7 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
     View view = LayoutInflater.from(context).inflate(R.layout.activity_item_card, parent, false);
     return new ViewHolder(view);
   }
+
 
   @Override
   public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
@@ -150,7 +212,6 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
       @Override
       public void onClick (View v){
         // add 1 to the nonograms like number
-
 
     }
     });
@@ -182,8 +243,8 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
       imageView.setImageBitmap(drawNonogram(nonogram));
       textView.setText(nonogram.getName());
     }
-
-
   }
+
+
 }
 
