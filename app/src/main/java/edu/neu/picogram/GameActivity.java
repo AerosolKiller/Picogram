@@ -55,10 +55,10 @@ public class GameActivity extends AppCompatActivity {
         v -> {
           boolean isSolved = nonogramView.getGame().isSolved();
           if (isSolved && userId != null) {
-            addPlayedGameToUser(userId, game.getName());
+            addPlayedSmallGameToUser(userId, game.getName());
+            chronometer.stop();
           }
           if (isSolved) {
-            addPlayedSmallGameToUser(userId, games.getName());
             chronometer.stop();
           }
           Toast.makeText(this, isSolved ? "Solved!" : "Not solved yet", Toast.LENGTH_SHORT).show();
