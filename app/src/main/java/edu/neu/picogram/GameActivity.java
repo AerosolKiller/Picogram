@@ -36,8 +36,9 @@ public class GameActivity extends AppCompatActivity {
     String mode = this.getIntent().getExtras().getString("mode");
     if (mode.equals("small")) {
       game = getGame(gameId);
-    } else {
-      game = LargeScaleGameConstants.getGames(this, R.raw.nonogram).get(gameId);
+    } else if (mode.equals("large")) {
+      int innerIndex = this.getIntent().getExtras().getInt("innerIndex");
+      game = LargeScaleGameConstants.getGame(this, gameId, innerIndex);
     }
     // 读取关卡后，实际上给solution，rowClues，colClues赋值了，创建Nonogram对象
     setContentView(R.layout.activity_game);
@@ -65,10 +66,10 @@ public class GameActivity extends AppCompatActivity {
         });
     // 目前显示hint，会把正确答案全部显示出来，nonogramView内部有个状态变量代表是否显示hint
     // 通过set方法，把状态变量传递给nonogramView，然后重新绘制View
-    Button hintbutton = findViewById(R.id.hint);
+    Button hintButton = findViewById(R.id.hint);
     TextView badge = findViewById(R.id.badge);
     badgeCount = Integer.parseInt(badge.getText().toString());
-    hintbutton.setOnClickListener(
+    hintButton.setOnClickListener(
         v -> {
           if (badgeCount > 0) {
             nonogramView.setShowSolution(true);

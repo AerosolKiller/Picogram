@@ -19,7 +19,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.time.Instant;import java.time.ZoneId;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,6 +77,8 @@ public class NonogramUtils {
       JSONArray jsonArray1 = jsonObject.getJSONArray("colClues");
       JSONArray jsonArray2 = jsonObject.getJSONArray("solution");
       String name = jsonObject.getString("name");
+      int width = Integer.parseInt(jsonObject.getString("width"));
+      int height = Integer.parseInt(jsonObject.getString("height"));
       rowClues = new int[jsonArray.length()][];
       colClues = new int[jsonArray1.length()][];
       solution = new int[jsonArray2.length()][];
@@ -103,7 +106,7 @@ public class NonogramUtils {
         }
         solution[i] = ints;
       }
-      return new Nonogram(name, colClues.length, rowClues.length, rowClues, colClues, solution);
+      return new Nonogram(name, width, height, rowClues, colClues, solution);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -259,20 +262,22 @@ public class NonogramUtils {
     return array;
   }
 
-  public static void saveNonogramToFireStore(String name,
-                                             String gameId,
-                                             int width,
-                                             int height,
-                                             String rowClues,
-                                             String colClues,
-                                             String solution,
-                                             String creator,
-                                             int likedNum,
-                                             String createTime
-                                             ) {
+  public static void saveNonogramToFireStore(
+      String name,
+      String gameId,
+      int width,
+      int height,
+      String rowClues,
+      String colClues,
+      String solution,
+      String creator,
+      int likedNum,
+      String createTime) {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    SerializableNonogram serializableGame = new SerializableNonogram(name,
+    SerializableNonogram serializableGame =
+        new SerializableNonogram(
+            name,
             gameId,
             width,
             height,
@@ -283,10 +288,11 @@ public class NonogramUtils {
             likedNum,
             createTime);
 
-    db.collection("games").document(gameId)
-            .set(serializableGame)
-            .addOnSuccessListener(aVoid -> {
-
+    db.collection("games")
+        .document(gameId)
+        .set(serializableGame)
+        .addOnSuccessListener(
+            aVoid -> {
               Log.d("Firestore", "Nonogram saved successfully");
             })
         .addOnFailureListener(
@@ -296,7 +302,7 @@ public class NonogramUtils {
   }
 
   public static void getNonogramFromFireStore(String gameName) {
-    //获取数据库信息
+    // 获取数据库信息
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     db.collection("nonogram")
@@ -313,7 +319,7 @@ public class NonogramUtils {
                 String creator = nonogram.getCreator();
                 String createTime = nonogram.getCreateTime();
                 // add other attribures if needed
-                //String rowClue = nonogram.getRowClues();
+                // String rowClue = nonogram.getRowClues();
 
               }
             })
@@ -345,11 +351,11 @@ public class NonogramUtils {
       FirebaseFirestore db = FirebaseFirestore.getInstance();
 
       DocumentReference userRef = db.collection("users").document(userId);
-      userRef.update("creationGameList", FieldValue.arrayUnion(gameId))
-              .addOnSuccessListener(aVoid ->
-                      Log.d(TAG, "Successfully added gameId to user's createdGames"))
-              .addOnFailureListener(e ->
-                      Log.e(TAG, "Failed to add gameId to user's createdGames", e));
+      userRef
+          .update("creationGameList", FieldValue.arrayUnion(gameId))
+          .addOnSuccessListener(
+              aVoid -> Log.d(TAG, "Successfully added gameId to user's createdGames"))
+          .addOnFailureListener(e -> Log.e(TAG, "Failed to add gameId to user's createdGames", e));
     }
   }
 
@@ -358,37 +364,38 @@ public class NonogramUtils {
     String colCluesList = NonogramUtils.convertArrayToString(game.getColClues());
     String solutionList = NonogramUtils.convertArrayToString(game.getSolution());
 
-    NonogramUtils.saveNonogramToFireStore(game.getName(),
-            game.getGameId(),
-            game.getWidth(),
-            game.getHeight(),
-            rowCluesList,
-            colCluesList,
-            solutionList,
-            game.getCreator(),
-            game.getLikedNum(),
-            game.getCreateTime()
-    );
+    NonogramUtils.saveNonogramToFireStore(
+        game.getName(),
+        game.getGameId(),
+        game.getWidth(),
+        game.getHeight(),
+        rowCluesList,
+        colCluesList,
+        solutionList,
+        game.getCreator(),
+        game.getLikedNum(),
+        game.getCreateTime());
   }
+
   public static void saveCreator(String userName, String gameId) {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     db.collection("games")
-            .document(gameId)
-            .update("creator", userName)
-            .addOnSuccessListener(
-                    aVoid -> {
-                      Log.d("FireStore", "creator saved successfully");
-                    })
-            .addOnFailureListener(
-                    e -> {
-                      Log.w("Firestore", "Error saveing creator name", e);
-                    });
+        .document(gameId)
+        .update("creator", userName)
+        .addOnSuccessListener(
+            aVoid -> {
+              Log.d("FireStore", "creator saved successfully");
+            })
+        .addOnFailureListener(
+            e -> {
+              Log.w("Firestore", "Error saveing creator name", e);
+            });
   }
 
   public static String generateGameName(String prefix) {
     Instant instant = Instant.now();
     DateTimeFormatter formatter =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneId.of("UTC"));
+        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneId.of("UTC"));
     String timeStamp = formatter.format(instant);
     return prefix + timeStamp;
   }
@@ -399,9 +406,10 @@ public class NonogramUtils {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     db.collection("users")
-            .document(userId)
-            .get()
-            .addOnCompleteListener(task -> {
+        .document(userId)
+        .get()
+        .addOnCompleteListener(
+            task -> {
               if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document.exists()) {
