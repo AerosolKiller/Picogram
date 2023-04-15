@@ -15,6 +15,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -327,6 +329,26 @@ public class NonogramUtils {
             e -> {
               Log.w("Firestore", "Error getting nonogram", e);
             });
+  }
+
+
+  // 从数据库中获取所有的nonogram的List
+  public static List<UserNonogram> getNonogramListFromFireStore() {
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    List<UserNonogram> nonogramList = new ArrayList<>();
+    db.collection("games")
+        .get()
+        .addOnCompleteListener(
+            task -> {
+              if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                  nonogramList.add(document.toObject(UserNonogram.class));
+                }
+              } else {
+                Log.w("Firestore", "Error getting nonogram list", task.getException());
+              }
+            });
+    return nonogramList;
   }
 
   public static void addPlayedSmallGameToUser(String userId, String gameId) {

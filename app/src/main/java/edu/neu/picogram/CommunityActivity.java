@@ -1,6 +1,7 @@
 package edu.neu.picogram;
 
 import static edu.neu.picogram.NonogramUtils.drawNonogram;
+import static edu.neu.picogram.NonogramUtils.getNonogramListFromFireStore;
 import static edu.neu.picogram.gamedata.UserNonogramConstants.getUserGames;
 
 import androidx.annotation.NonNull;
@@ -28,6 +29,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class CommunityActivity extends AppCompatActivity {
@@ -42,7 +44,10 @@ public class CommunityActivity extends AppCompatActivity {
 
   RecyclerView recyclerView;
 
-  public ArrayList<UserNonogram> nonogramList;
+  public List<UserNonogram> nonogramList;
+
+  public List<UserNonogram> testList;
+
 
 
   private FirebaseAuth mAuth;
@@ -141,7 +146,8 @@ public class CommunityActivity extends AppCompatActivity {
     // 创建模拟数据
 
       //创建数据对象；
-    nonogramList = getUserGames();
+    nonogramList = getNonogramListFromFireStore();
+    Toast.makeText(this, nonogramList.toString(), Toast.LENGTH_SHORT).show();
 
 
     //创建适配器
@@ -167,9 +173,9 @@ public class CommunityActivity extends AppCompatActivity {
 class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder> {
 
   private Context context;
-  private ArrayList<UserNonogram> nonogramList;
+  private List<UserNonogram> nonogramList;
 
-  public CommunityAdapter(Context context, ArrayList<UserNonogram> nonogramList) {
+  public CommunityAdapter(Context context, List<UserNonogram> nonogramList) {
     this.context = context;
     this.nonogramList = nonogramList;
   }
@@ -200,18 +206,21 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
   }
 
 
+
   @Override
   public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
     // 绑定数据
     Nonogram nonogram = nonogramList.get(position);
     holder.setData(nonogram);
 
+    // set the like button click listener
     holder.likeButton.setOnClickListener(new View.OnClickListener()
 
     {
       @Override
       public void onClick (View v){
         // add 1 to the nonograms like number
+        holder.likeButton.setImageResource(R.drawable.baseline_thumb_up_alt_24);
 
     }
     });
@@ -237,14 +246,17 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
       imageView = itemView.findViewById(R.id.image);
       textView = itemView.findViewById(R.id.name);
       likeButton = itemView.findViewById(R.id.like_button);
+
+
     }
+
+    // 绑定数据
 
     public void setData(Nonogram nonogram) {
       imageView.setImageBitmap(drawNonogram(nonogram));
       textView.setText(nonogram.getName());
     }
   }
-
 
 }
 
