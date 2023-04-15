@@ -1,5 +1,6 @@
 package edu.neu.picogram;
 
+import static android.content.ContentValues.TAG;
 import static edu.neu.picogram.NonogramUtils.drawNonogram;
 import static edu.neu.picogram.gamedata.UserNonogramConstants.getUserGames;
 
@@ -28,6 +29,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class CommunityActivity extends AppCompatActivity {
@@ -48,7 +51,6 @@ public class CommunityActivity extends AppCompatActivity {
   private FirebaseAuth mAuth;
   private FirebaseAuth.AuthStateListener mAuthStateListener;
   FirebaseUser user;
-
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -138,16 +140,21 @@ public class CommunityActivity extends AppCompatActivity {
     // List<Data> list ---> Apdater ---> setAdapter ---> 显示数据
     nonogramList = new ArrayList<>();
 
-    // 创建模拟数据
-
-      //创建数据对象；
-    nonogramList = getUserGames();
-
-
-    //创建适配器
-    CommunityAdapter adapter = new CommunityAdapter(this, nonogramList);
-    //设置到Recycler view里面去
-    recyclerView.setAdapter(adapter);
+    //创建数据对象；
+    GameRepository gameRepository = new GameRepository();
+    gameRepository.fetchAllGames()
+            .thenAccept(games -> {
+              nonogramList.addAll(games);
+//              Log.d("gameList", nonogramList.toString());
+              CommunityAdapter adapter = new CommunityAdapter(this, nonogramList);
+              //设置到Recycler view里面去
+              recyclerView.setAdapter(adapter);
+            })
+            .exceptionally(throwable -> {
+              // Handle any error that occurs during the fetch operation
+              Log.e(TAG, "Error fetching games: " + throwable.getMessage());
+              return null;
+              });
   }
 
 
@@ -179,17 +186,14 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
     this.nonogramList = (ArrayList<UserNonogram>) nonogramList.stream()
             .sorted((a, b) -> b.getLikedNum() - a.getLikedNum())
             .collect(Collectors.toList());
-//    Log.d("TAG", nonogramList.toString());
   }
 
   // update the nonogram list by newest
-    public void sortByNewest() {
-        this.nonogramList = (ArrayList<UserNonogram>) nonogramList.stream()
-                .sorted((a, b) -> b.getCreateTime().compareTo(a.getCreateTime()))
-                .collect(Collectors.toList());
-    }
-
-
+  public void sortByNewest() {
+    this.nonogramList = (ArrayList<UserNonogram>) nonogramList.stream()
+            .sorted((a, b) -> b.getCreateTime().compareTo(a.getCreateTime()))
+            .collect(Collectors.toList());
+  }
 
   @NonNull
   @Override
@@ -244,7 +248,6 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
       textView.setText(nonogram.getName());
     }
   }
-
 
 }
 

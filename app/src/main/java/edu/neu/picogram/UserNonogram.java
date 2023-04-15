@@ -1,6 +1,10 @@
 package edu.neu.picogram;
 
+import static edu.neu.picogram.NonogramUtils.convertStringToArray;
+
 import androidx.annotation.NonNull;
+
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.UUID;
 
@@ -13,7 +17,16 @@ public class UserNonogram extends Nonogram{
     // 时间参数
     private String createTime;
 
-    public UserNonogram(String name, String creator, int likedNum, String createTime, int width, int height, int[][] rowClues, int[][] colClues, int[][] solution) {
+    public UserNonogram() {}
+    public UserNonogram(String name,
+                        String creator,
+                        int likedNum,
+                        String createTime,
+                        int width,
+                        int height,
+                        int[][] rowClues,
+                        int[][] colClues,
+                        int[][] solution) {
         super(name, width, height, rowClues, colClues, solution);
         this.gameId = UUID.randomUUID().toString();
         this.creator = creator;
@@ -62,5 +75,26 @@ public class UserNonogram extends Nonogram{
                 ", gameId='" + gameId + '\'' +
                 ", createTime='" + createTime + '\'' +
                 '}';
+    }
+
+    public static UserNonogram fromDocument(DocumentSnapshot document) {
+        String name = document.getString("name");
+        String creator = document.getString("creator");
+        String createTime = document.getString("createTime");
+        int likedNum = (document.getLong("likedNum")).intValue();
+        int width = (document.getLong("width")).intValue();
+        int height = (document.getLong("height")).intValue();
+        String rowCluesString = document.getString("rowClues");
+        int[][] rowClues = convertStringToArray(rowCluesString, width, height);
+        String colCluesString = document.getString("colClues");
+        int[][] colClues = convertStringToArray(colCluesString, width, height);
+        String solutionString = document.getString("solution");
+        int[][] solution = convertStringToArray(solutionString, width, height);
+
+        UserNonogram game = new UserNonogram(name,
+                creator,
+                likedNum, createTime, width, height, rowClues, colClues, solution);
+
+        return game;
     }
 }

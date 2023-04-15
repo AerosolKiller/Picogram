@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -19,7 +20,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.time.Instant;import java.time.ZoneId;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -247,16 +249,19 @@ public class NonogramUtils {
 
   // 转换strings 到 2d array
   public static int[][] convertStringToArray(String string, int rows, int cols) {
-    String[] rowStrings = string.split("; ");
-    int[][] array = new int[rows][cols];
+    if (!string.isEmpty()) {
+      String[] rowStrings = string.split("; ");
+      int[][] array = new int[rows][cols];
 
-    for (int i = 0; i < rowStrings.length; i++) {
-      String[] colStrings = rowStrings[i].split(", ");
-      for (int j = 0; j < colStrings.length; j++) {
-        array[i][j] = Integer.parseInt(colStrings[j]);
+      for (int i = 0; i < rowStrings.length; i++) {
+        String[] colStrings = rowStrings[i].split(", ");
+        for (int j = 0; j < colStrings.length; j++) {
+          array[i][j] = Integer.parseInt(colStrings[j]);
+        }
       }
+      return array;
     }
-    return array;
+    throw new IllegalArgumentException("Empty string encountered, cannot convert to a number.");
   }
 
   public static void saveNonogramToFireStore(String name,
