@@ -267,7 +267,6 @@ public class NonogramUtils {
     }
     throw new IllegalArgumentException("Empty string encountered, cannot convert to a number.");
   }
-
   public static void saveNonogramToFireStore(
       String name,
       String gameId,
