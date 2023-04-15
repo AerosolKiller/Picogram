@@ -34,6 +34,8 @@ public class UserNonogram extends Nonogram{
         this.createTime = createTime;
     }
 
+    public UserNonogram(){}
+
     public String getGameId() {
         return gameId;
     }

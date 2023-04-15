@@ -30,7 +30,7 @@
     <!--    add a imageview-->
     <ImageButton
         android:id="@+id/like_button"
-
+        android:onClick="onClick"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_below="@+id/image"

@@ -3,11 +3,27 @@ package edu.neu.picogram.gamedata;
 import android.content.Context;
 import edu.neu.picogram.Nonogram;
 import edu.neu.picogram.NonogramUtils;
+import edu.neu.picogram.R;
+
 import java.util.ArrayList;
 
 public class LargeScaleGameConstants {
-  public static ArrayList<Nonogram> getGames(Context context, int resourceId) {
-    Nonogram nonogram = NonogramUtils.restoreGame(context, resourceId);
+
+  public static final int[] largeScaleGameIds = {R.raw.nonogram, R.raw.nonogram2};
+
+  public static ArrayList<Nonogram> getGames(Context context) {
+    ArrayList<Nonogram> games = new ArrayList<>();
+    for (int largeScaleGameId : largeScaleGameIds) {
+      Nonogram game = NonogramUtils.restoreGame(context, largeScaleGameId);
+      if (game != null) {
+        games.add(game);
+      }
+    }
+    return games;
+  }
+
+  public static ArrayList<Nonogram> getGames(Context context, int index) {
+    Nonogram nonogram = NonogramUtils.restoreGame(context, largeScaleGameIds[index]);
     if (nonogram == null) {
       return null;
     }
@@ -26,8 +42,24 @@ public class LargeScaleGameConstants {
     return games;
   }
 
-  public static Nonogram getGame(Context context, int resourceId, int index) {
-    return getGames(context, resourceId).get(index);
+  public static Nonogram getGame(Context context, int outerIndex, int innerIndex) {
+    return getGames(context, outerIndex).get(innerIndex);
+  }
+
+  public static int getGameWidth(Context context, int index) {
+    Nonogram nonogram = NonogramUtils.restoreGame(context, largeScaleGameIds[index]);
+    if (nonogram == null) {
+      return 0;
+    }
+    return nonogram.getWidth();
+  }
+
+  public static int getGameHeight(Context context, int index) {
+    Nonogram nonogram = NonogramUtils.restoreGame(context, largeScaleGameIds[index]);
+    if (nonogram == null) {
+      return 0;
+    }
+    return nonogram.getHeight();
   }
 
   private static int[][][] splitMatrix(int[][] inputMatrix, int numRows, int numCols) {

@@ -92,7 +92,7 @@ public class TakePhotoActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // 检查是否有相机权限和读取相册权限，如果没有则申请相机权限
                 if (ContextCompat.checkSelfPermission(TakePhotoActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(TakePhotoActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(TakePhotoActivity.this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+//                    ActivityCompat.requestPermissions(TakePhotoActivity.this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
                     //申请读取文件和照片的权限
                     ActivityCompat.requestPermissions(TakePhotoActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_EXTERNAL_STORAGE_REQUEST_CODE);
                     ActivityCompat.requestPermissions(TakePhotoActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
@@ -105,28 +105,41 @@ public class TakePhotoActivity extends AppCompatActivity {
         });
 
         // 打开相机拍照,并显示在ImageView中,并保存到本地
+        // TODO: 每次拍照，更新image View，更新有问题。
         takePhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // 打开拍照界面
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-                // 尝试保存拍的照片
-                if(intent.resolveActivity(getPackageManager()) != null) {
-                    File photoFile = null;
-                    try {
-                        photoFile = createImageFile();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                if (ContextCompat.checkSelfPermission(TakePhotoActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(TakePhotoActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(TakePhotoActivity.this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+                    //申请读取文件和照片的权限
+                    ActivityCompat.requestPermissions(TakePhotoActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_EXTERNAL_STORAGE_REQUEST_CODE);
+//                    ActivityCompat.requestPermissions(TakePhotoActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+                } else {
+                    // 打开拍照界面
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+                    // 尝试保存拍的照片
+                    if(intent.resolveActivity(getPackageManager()) != null) {
+                        File photoFile = null;
+                        try {
+                            photoFile = createImageFile();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+//                        photoFile = new File(getExternalFilesDir(Environment.DIRECTORY_DCIM), "photo.jpg");
+                        photoUri = FileProvider.getUriForFile(TakePhotoActivity.this, "edu.neu.picogram.fileProvider", photoFile);
+
+                        Log.d("photoUri", photoUri.toString());
+
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+                        startActivityForResult(intent, CAMERA_REQUEST_CODE);
+                        imageView.setImageURI(photoUri);
+
                     }
-
-                    photoFile = new File(getExternalFilesDir(Environment.DIRECTORY_DCIM), "photo.jpg");
-                    photoUri = FileProvider.getUriForFile(TakePhotoActivity.this, "edu.neu.picogram.fileProvider", photoFile);
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
-                    startActivityForResult(intent, CAMERA_REQUEST_CODE);
-                    imageView.setImageURI(photoUri);
-
                 }
+
             }
         });
 
@@ -178,6 +191,7 @@ public class TakePhotoActivity extends AppCompatActivity {
 
         // 打开相机拍照,并显示在ImageView中,并保存到本地
         if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK) {
+
             imageView.setImageURI(photoUri);
 
             Bitmap imageBitmap = null;

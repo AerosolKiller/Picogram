@@ -20,7 +20,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView2"
+        android:id="@+id/recyclerView1"
         android:layout_width="411dp"
         android:layout_height="228dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -50,27 +50,18 @@
         android:textAlignment="textStart"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="@+id/recyclerView2"
-        app:layout_constraintTop_toBottomOf="@+id/recyclerView2" />
+        app:layout_constraintStart_toStartOf="@+id/recyclerView1"
+        app:layout_constraintTop_toBottomOf="@+id/recyclerView1" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_width="411dp"
-        android:layout_height="326dp"
+        android:id="@+id/recyclerView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_bigScalePic"
-        app:layout_constraintVertical_bias="0.846" />
-
-    <Button
-        android:id="@+id/largeScaleGameButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Large Scale Game"
-        app:layout_constraintTop_toBottomOf="@+id/tv_bigScalePic"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_bigScalePic" />
 
     <ImageButton
         android:id="@+id/homeButton"

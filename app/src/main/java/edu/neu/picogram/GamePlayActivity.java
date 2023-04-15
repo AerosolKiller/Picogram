@@ -9,42 +9,48 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
+
+import edu.neu.picogram.gamedata.LargeScaleGameConstants;
 
 public class GamePlayActivity extends AppCompatActivity {
 
   RecyclerView smallScaleGameRecyclerView;
-  List<Nonogram> games;
+  RecyclerView largeScaleGameRecyclerView;
+  List<Nonogram> smallScaleGames;
+  List<Nonogram> largeScaleGames;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    games = getGames();
+    smallScaleGames = getGames();
+    largeScaleGames = LargeScaleGameConstants.getGames(this);
     setContentView(R.layout.activity_game_play);
-    Button button = findViewById(R.id.largeScaleGameButton);
-    button.setOnClickListener(
-        v -> {
-          Intent intent = new Intent(this, BigScaleGameActivity.class);
-          startActivity(intent);
-        });
     createRecyclerView();
   }
 
   public void createRecyclerView() {
-    smallScaleGameRecyclerView = findViewById(R.id.recyclerView2);
-    GameAdapter gameAdapter = new GameAdapter(this, games);
+    smallScaleGameRecyclerView = findViewById(R.id.recyclerView1);
+    largeScaleGameRecyclerView = findViewById(R.id.recyclerView2);
+    GameAdapter gameAdapter = new GameAdapter(this, smallScaleGames, "small");
     smallScaleGameRecyclerView.setAdapter(gameAdapter);
     smallScaleGameRecyclerView.setHasFixedSize(true);
     RecyclerView.LayoutManager layoutManager =
         new GridLayoutManager(this, 2, RecyclerView.HORIZONTAL, false);
     smallScaleGameRecyclerView.setLayoutManager(layoutManager);
+    GameAdapter gameAdapter2 = new GameAdapter(this, largeScaleGames, "large");
+    largeScaleGameRecyclerView.setAdapter(gameAdapter2);
+    largeScaleGameRecyclerView.setHasFixedSize(true);
+    RecyclerView.LayoutManager layoutManager2 =
+        new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false);
+    largeScaleGameRecyclerView.setLayoutManager(layoutManager2);
   }
 }
 
@@ -52,10 +58,12 @@ class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder> {
 
   private final List<Nonogram> games;
   private final Context context;
+  private final String mode;
 
-  public GameAdapter(Context context, List<Nonogram> games) {
+  public GameAdapter(Context context, List<Nonogram> games, String mode) {
     this.context = context;
     this.games = games;
+    this.mode = mode;
   }
 
   @NonNull
@@ -71,12 +79,22 @@ class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder> {
     holder.gameName.setText(game.getName());
     holder.itemView.setOnClickListener(
         v -> {
+          if (mode.equals("large")) {
+            Intent intent = new Intent(context, BigScaleGameActivity.class);
+            intent.putExtra("index", position);
+            context.startActivity(intent);
+            return;
+          }
           Intent intent = new Intent(context, GameActivity.class);
           intent.putExtra("mode", "small");
           intent.putExtra("index", position);
           context.startActivity(intent);
         });
-    holder.gameImage.setImageBitmap(drawNonogram(game));
+    if (mode.equals("large")) {
+      holder.gameImage.setImageBitmap(drawNonogram(game, 300));
+    } else {
+      holder.gameImage.setImageBitmap(drawNonogram(game));
+    }
   }
 
   @Override
