@@ -4,13 +4,17 @@ import static edu.neu.picogram.NonogramUtils.addPlayedSmallGameToUser;
 import static edu.neu.picogram.gamedata.NonogramGameConstants.getGame;
 import static edu.neu.picogram.gamedata.UserNonogramConstants.getUserGame;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Chronometer;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import com.google.firebase.auth.FirebaseAuth;
@@ -18,9 +22,11 @@ import edu.neu.picogram.gamedata.LargeScaleGameConstants;
 
 public class GameActivity extends AppCompatActivity {
   private Chronometer chronometer;
+  SharedPreferences sharedPreferences;
   Nonogram game;
   String userId;
   int badgeCount;
+  int gameId;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +38,7 @@ public class GameActivity extends AppCompatActivity {
 
     // 游戏关卡存储在raw文件夹中，每个关卡对应一个json文件，读取第一关的json文件作为默认关卡
     //        restoreGame(this, R.raw.level1);
-    int gameId = this.getIntent().getExtras().getInt("index");
+    gameId = this.getIntent().getExtras().getInt("index");
     String mode = this.getIntent().getExtras().getString("mode");
     if (mode.equals("small")) {
       game = getGame(gameId);
@@ -55,14 +61,26 @@ public class GameActivity extends AppCompatActivity {
     button.setOnClickListener(
         v -> {
           boolean isSolved = nonogramView.getGame().isSolved();
-          if (isSolved && userId != null) {
+          if (!isSolved) {
+            Toast.makeText(this, "Not solved yet", Toast.LENGTH_SHORT).show();
+            return;
+          }
+          if (userId != null) {
             addPlayedSmallGameToUser(userId, game.getName());
-            chronometer.stop();
           }
-          if (isSolved) {
-            chronometer.stop();
-          }
-          Toast.makeText(this, isSolved ? "Solved!" : "Not solved yet", Toast.LENGTH_SHORT).show();
+          updateGameProgress(gameId, mode);
+          chronometer.stop();
+          AlertDialog.Builder builder = new AlertDialog.Builder(this);
+          builder.setTitle("Congratulations!");
+          builder.setMessage("You have solved the puzzle!\nTime used: " + chronometer.getText());
+          builder.setPositiveButton(
+              "OK",
+              (dialog, which) -> {
+                dialog.dismiss();
+                finish();
+              });
+          builder.show();
+          Toast.makeText(this, "Solved", Toast.LENGTH_SHORT).show();
         });
     // 目前显示hint，会把正确答案全部显示出来，nonogramView内部有个状态变量代表是否显示hint
     // 通过set方法，把状态变量传递给nonogramView，然后重新绘制View
@@ -91,5 +109,31 @@ public class GameActivity extends AppCompatActivity {
           nonogramView.setMode(!isChecked);
           nonogramView.invalidate();
         });
+  }
+
+  private void updateGameProgress(int index, String mode) {
+    if (mode.equals("small")) {
+      sharedPreferences = getSharedPreferences("game_progress", MODE_PRIVATE);
+      SharedPreferences.Editor editor = sharedPreferences.edit();
+      boolean isSolved = sharedPreferences.getBoolean(index + "isSolved", false);
+      if (isSolved) {
+        return;
+      }
+      int currentLevel = sharedPreferences.getInt("current_level", 4);
+      editor.putInt("current_level", currentLevel + 1);
+      editor.putBoolean(index + "isSolved", true);
+      editor.apply();
+    } else if (mode.equals("large")) {
+      sharedPreferences = getSharedPreferences("large_game_progress", MODE_PRIVATE);
+      SharedPreferences.Editor editor = sharedPreferences.edit();
+      boolean isSolved = sharedPreferences.getBoolean(gameId + " " + index + "isSolved", false);
+      if (isSolved) {
+        return;
+      }
+      int currentLevel = sharedPreferences.getInt(gameId + "current_level", 0);
+      editor.putInt("current_level", currentLevel + 1);
+      editor.putBoolean(gameId + " " + index + "isSolved", true);
+      editor.apply();
+    }
   }
 }

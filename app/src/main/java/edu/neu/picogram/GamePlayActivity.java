@@ -1,10 +1,12 @@
 package edu.neu.picogram;
 
+import static android.content.Context.MODE_PRIVATE;
 import static edu.neu.picogram.NonogramUtils.drawNonogram;
 import static edu.neu.picogram.gamedata.NonogramGameConstants.getGames;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,6 +29,7 @@ public class GamePlayActivity extends AppCompatActivity {
   RecyclerView largeScaleGameRecyclerView;
   List<Nonogram> smallScaleGames;
   List<Nonogram> largeScaleGames;
+  SharedPreferences sharedPreferences;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +37,14 @@ public class GamePlayActivity extends AppCompatActivity {
     smallScaleGames = getGames();
     largeScaleGames = LargeScaleGameConstants.getGames(this);
     setContentView(R.layout.activity_game_play);
+    sharedPreferences = getSharedPreferences("game_progress", MODE_PRIVATE);
+
+    SwitchCompat unlockAll = findViewById(R.id.unLockALl);
+    unlockAll.setOnClickListener(
+        v -> {
+          sharedPreferences.edit().putBoolean("unlockAll", unlockAll.isChecked()).apply();
+          createRecyclerView();
+        });
     createRecyclerView();
   }
 
@@ -52,6 +64,12 @@ public class GamePlayActivity extends AppCompatActivity {
         new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false);
     largeScaleGameRecyclerView.setLayoutManager(layoutManager2);
   }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    createRecyclerView();
+  }
 }
 
 class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder> {
@@ -59,6 +77,7 @@ class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder> {
   private final List<Nonogram> games;
   private final Context context;
   private final String mode;
+  SharedPreferences sharedPreferences;
 
   public GameAdapter(Context context, List<Nonogram> games, String mode) {
     this.context = context;
@@ -75,14 +94,19 @@ class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder> {
 
   @Override
   public void onBindViewHolder(@NonNull GameViewHolder holder, int position) {
+
     Nonogram game = games.get(position);
     holder.gameName.setText(game.getName());
+    boolean isUnlocked = position <= loadGameProgress() || loadIsUnlocked();
     holder.itemView.setOnClickListener(
         v -> {
           if (mode.equals("large")) {
             Intent intent = new Intent(context, BigScaleGameActivity.class);
             intent.putExtra("index", position);
             context.startActivity(intent);
+            return;
+          }
+          if (!isUnlocked) {
             return;
           }
           Intent intent = new Intent(context, GameActivity.class);
@@ -92,9 +116,21 @@ class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder> {
         });
     if (mode.equals("large")) {
       holder.gameImage.setImageBitmap(drawNonogram(game, 300));
-    } else {
+    } else if (isUnlocked) {
       holder.gameImage.setImageBitmap(drawNonogram(game));
+    } else {
+      holder.gameImage.setImageResource(R.drawable.baseline_question_mark_24);
     }
+  }
+
+  private int loadGameProgress() {
+    sharedPreferences = context.getSharedPreferences("game_progress", MODE_PRIVATE);
+    return sharedPreferences.getInt("current_level", 4);
+  }
+
+  private boolean loadIsUnlocked() {
+    sharedPreferences = context.getSharedPreferences("game_progress", MODE_PRIVATE);
+    return sharedPreferences.getBoolean("unlockAll", false);
   }
 
   @Override
