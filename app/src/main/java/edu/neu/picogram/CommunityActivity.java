@@ -2,6 +2,7 @@ package edu.neu.picogram;
 
 import static edu.neu.picogram.NonogramUtils.drawNonogram;
 import static edu.neu.picogram.NonogramUtils.getNonogramListFromFireStore;
+import static edu.neu.picogram.NonogramUtils.getUserFromFirestore;
 import static edu.neu.picogram.gamedata.UserNonogramConstants.getUserGames;
 
 import androidx.annotation.NonNull;
@@ -42,17 +43,21 @@ public class CommunityActivity extends AppCompatActivity {
   private Button favoriteButton;
 
 
+
   RecyclerView recyclerView;
 
   public List<UserNonogram> nonogramList;
 
   public List<UserNonogram> testList;
 
+  public List<Boolean> isLikedList;
 
 
   private FirebaseAuth mAuth;
   private FirebaseAuth.AuthStateListener mAuthStateListener;
   FirebaseUser user;
+
+  boolean isLiked = false;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +69,7 @@ public class CommunityActivity extends AppCompatActivity {
     newestButton = findViewById(R.id.newest);
     favoriteButton = findViewById(R.id.favorite);
 
+
     mAuth = FirebaseAuth.getInstance();
 
 
@@ -73,8 +79,7 @@ public class CommunityActivity extends AppCompatActivity {
             // User is signed in
             Log.d("TAG", "onAuthStateChanged:signed_in:" + user.getUid());
         } else {
-            // User is signed out
-            Log.d("TAG", "onAuthStateChanged:signed_out");
+          Toast.makeText(this, "Please login firstly to access the community.", Toast.LENGTH_SHORT).show();
         }
 
     };
@@ -209,20 +214,37 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
   }
 
 
-
   @Override
   public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
     // 绑定数据
-    Nonogram nonogram = nonogramList.get(position);
+    UserNonogram nonogram = nonogramList.get(position);
+    final boolean[] isLiked = {false};
+
     holder.setData(nonogram);
 
-    // set the like button click listener
-    holder.likeButton.setOnClickListener(new View.OnClickListener()
+    holder.imageView.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        Intent intent = new Intent(context, GameActivity.class);
+        intent.putExtra("gameName", nonogram.getName());
+        Toast.makeText(context, nonogram.getName(), Toast.LENGTH_SHORT).show();
+        intent.putExtra("mode", "firebase");
+        context.startActivity(intent);
+      }
+    });
 
-    {
+    // set the like button click listener
+    holder.likeButton.setOnClickListener(new View.OnClickListener()  {
       @Override
       public void onClick (View v){
         // add 1 to the nonograms like number
+        isLiked[0] = !isLiked[0];
+        // TODO: 获取当前用户信息，通过对比当前用户中likedGameList和当前的nonogram name来判断是否已经点赞。
+        User user = getUserFromFirestore();
+        // 如果已经点赞，那么就取消点赞。把当前nonogram name从likedGameList中删除，同时把likedNum减1，同时把likeButton的图片改为未点赞的图片
+        user.getLikedGameList().stream().filter(likedGame -> likedGame.equals(nonogram.getName())).findFirst().ifPresent(likedGame -> isLiked[0] = true);
+
+        // 如果没有点赞，那么就点赞。把当前nonogram name添加到likedGameList中，同时把likedNum加1，同时把likeButton的图片改为点赞的图片
         holder.likeButton.setImageResource(R.drawable.baseline_thumb_up_alt_24);
 
     }
@@ -241,6 +263,8 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
     private TextView textView;
     private ImageButton likeButton;
 
+    private TextView textView_likedNum;
+
 
     public ViewHolder(@NonNull View itemView) {
       super(itemView);
@@ -249,17 +273,20 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
       imageView = itemView.findViewById(R.id.image);
       textView = itemView.findViewById(R.id.name);
       likeButton = itemView.findViewById(R.id.like_button);
-
+      textView_likedNum = itemView.findViewById(R.id.likedNumber);
 
     }
 
     // 绑定数据
 
-    public void setData(Nonogram nonogram) {
+    public void setData(UserNonogram nonogram) {
       imageView.setImageBitmap(drawNonogram(nonogram));
       textView.setText(nonogram.getName());
+      textView_likedNum.setText(nonogram.getLikedNum() + "");
     }
   }
+
+
 
 }
 

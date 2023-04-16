@@ -1,6 +1,7 @@
 package edu.neu.picogram;
 
 import static edu.neu.picogram.NonogramUtils.addPlayedSmallGameToUser;
+import static edu.neu.picogram.NonogramUtils.getNonogramFromFireStore;
 import static edu.neu.picogram.gamedata.NonogramGameConstants.getGame;
 import static edu.neu.picogram.gamedata.UserNonogramConstants.getUserGame;
 
@@ -45,6 +46,11 @@ public class GameActivity extends AppCompatActivity {
     } else if (mode.equals("large")) {
       int innerIndex = this.getIntent().getExtras().getInt("innerIndex");
       game = LargeScaleGameConstants.getGame(this, gameId, innerIndex);
+    } else if(mode.equals("firebase")){
+        String gameName = this.getIntent().getExtras().getString("gameName");
+        game = getNonogramFromFireStore(gameName);
+        game.setWidth(5);
+        game.setHeight(5);
     }
     // 读取关卡后，实际上给solution，rowClues，colClues赋值了，创建Nonogram对象
     setContentView(R.layout.activity_game);

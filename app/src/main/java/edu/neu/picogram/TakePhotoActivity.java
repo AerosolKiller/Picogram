@@ -69,6 +69,8 @@ public class TakePhotoActivity extends AppCompatActivity {
 
     private Button getGameButton;
 
+    private Button addGameToPhoneButton;
+
     private ActivityResultLauncher<Intent> resultLauncher;
     ImageView imageView;
 
@@ -97,6 +99,7 @@ public class TakePhotoActivity extends AppCompatActivity {
         getPhotoButton = findViewById(R.id.btn_getPhoto);
         cropPhotoButton = findViewById(R.id.btn_transformPhoto);
         getGameButton = findViewById(R.id.btn_getGame);
+        addGameToPhoneButton = findViewById(R.id.btn_addGameToPhone);
 
         imageView = findViewById(R.id.imageView1);
         bitmap = null;
@@ -192,7 +195,7 @@ public class TakePhotoActivity extends AppCompatActivity {
 //                startActivity(intent);
                 if (bitmap != null) {
                     userNonogram = new UserNonogram();
-                    int size = 50;
+                    int size = 100;
                     int[][] gameArray = convertToNonogramMatrix(bitmap, size);
                     userNonogram.setSolution(gameArray);
                     userNonogram.setHeight(size);
@@ -201,9 +204,26 @@ public class TakePhotoActivity extends AppCompatActivity {
                     bitmap = drawNonogram(userNonogram);
                     imageView.setImageBitmap(bitmap);
 
+                    getGameButton.setVisibility(View.INVISIBLE);
+                    cropPhotoButton.setVisibility(View.INVISIBLE);
+                    addGameToPhoneButton.setVisibility(View.VISIBLE);
+
                 } else
                     Toast.makeText(TakePhotoActivity.this, "Please take a photo firstly!", Toast.LENGTH_SHORT).show();
             }
+        });
+
+        addGameToPhoneButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // add the LargeScaleGame to the phone
+                Intent intent = new Intent(TakePhotoActivity.this, GamePlayActivity.class);
+
+                startActivity(intent);
+
+
+            }
+
         });
 
     }

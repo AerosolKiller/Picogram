@@ -21,7 +21,7 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView1"
-        android:layout_width="411dp"
+        android:layout_width="match_parent"
         android:layout_height="228dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -29,7 +29,7 @@
 
     <TextView
         android:id="@+id/tv_smallScalePic"
-        android:layout_width="140dp"
+        android:layout_width="wrap_content"
         android:layout_height="35dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
@@ -44,21 +44,21 @@
         android:id="@+id/unLockALl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@+id/tv_smallScalePic"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_smallScalePic"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tv_smallScalePic"
         app:layout_constraintTop_toTopOf="@+id/tv_smallScalePic" />
 
     <TextView
         android:id="@+id/tv_bigScalePic"
         android:layout_width="140dp"
         android:layout_height="35dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="24dp"
         android:text="Big Scale Games"
         android:textAlignment="textStart"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="@+id/recyclerView1"
+        app:layout_constraintStart_toStartOf="@+id/tv_smallScalePic"
         app:layout_constraintTop_toBottomOf="@+id/recyclerView1" />
 
     <androidx.recyclerview.widget.RecyclerView
