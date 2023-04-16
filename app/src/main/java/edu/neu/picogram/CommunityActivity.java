@@ -214,6 +214,16 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
     Nonogram nonogram = nonogramList.get(position);
     holder.setData(nonogram);
 
+    holder.imageView.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        Intent intent = new Intent(context, GameActivity.class);
+        intent.putExtra("nonogram", nonogram.getName());
+        intent.putExtra("mode", "firebase");
+        context.startActivity(intent);
+      }
+    });
+
     // set the like button click listener
     holder.likeButton.setOnClickListener(new View.OnClickListener()
 
