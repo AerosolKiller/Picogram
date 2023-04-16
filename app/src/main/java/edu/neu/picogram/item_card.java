@@ -11,6 +11,4 @@ public class item_card extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_card);
     }
-
-
 }
