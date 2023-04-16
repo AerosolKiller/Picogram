@@ -45,10 +45,18 @@
         android:id="@+id/btn_transformPhoto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:text="Transform Photo to game"
-        />
+        android:layout_above="@+id/btn_getGame"
+        android:text="crop the photo" />
+
+    <Button
+        android:id="@+id/btn_getGame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="Get Game from photo"
+        android:layout_centerHorizontal="true"
+         />
 
 
 </RelativeLayout>

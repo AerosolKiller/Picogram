@@ -1,11 +1,20 @@
 package edu.neu.picogram;
 
+import static edu.neu.picogram.NonogramImageConverter.convertToNonogramMatrix;
 import static edu.neu.picogram.NonogramUtils.convertStringToArray;
+
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.MediaStore;
 
 import androidx.annotation.NonNull;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.UUID;
 
 public class UserNonogram extends Nonogram{
@@ -13,9 +22,11 @@ public class UserNonogram extends Nonogram{
     // 如果需要也可以添加新的参数和方法
     private String creator;
     private int likedNum;
+    private String gameId;
     // 时间参数
     private String createTime;
 
+    public UserNonogram() {}
     public UserNonogram(String name,
                         String creator,
                         int likedNum,
@@ -26,12 +37,23 @@ public class UserNonogram extends Nonogram{
                         int[][] colClues,
                         int[][] solution) {
         super(name, width, height, rowClues, colClues, solution);
+        this.gameId = UUID.randomUUID().toString();
         this.creator = creator;
         this.likedNum = likedNum;
         this.createTime = createTime;
     }
 
-    public UserNonogram(){}
+
+    public void setSolution(int[][] solution) {
+        this.solution = solution;
+    }
+    public String getGameId() {
+        return gameId;
+    }
+
+    public void setGameId(String gameId) {
+        this.gameId = gameId;
+    }
 
     public String getCreator() {
         return creator;
@@ -87,5 +109,27 @@ public class UserNonogram extends Nonogram{
         return new UserNonogram(name,
                 creator,
                 likedNum, createTime, width, height, rowClues, colClues, solution);
+
+
     }
+
+    public void setBitmapUri(Uri bitmapUri, Context context) throws IOException {
+        Uri uri = bitmapUri;
+        Bitmap bitmap = getBitmapFromUri(uri, context);
+
+        int[][] gameMatrix = convertToNonogramMatrix(bitmap, 50);
+
+        this.width = gameMatrix.length;
+        this.height = gameMatrix[0].length;
+
+    }
+
+    public Bitmap getBitmapFromUri(Uri uri, Context context) throws IOException {
+        InputStream input = context.getContentResolver().openInputStream(uri);
+        Bitmap bitmap = BitmapFactory.decodeStream(input);
+        input.close();
+        return bitmap;
+    }
+
+
 }
