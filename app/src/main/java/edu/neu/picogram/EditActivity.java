@@ -21,6 +21,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -46,6 +48,9 @@ public class EditActivity extends AppCompatActivity {
   UserNonogram createdGame;
   private FirebaseAuth.AuthStateListener mAuthStateListener;
 
+  private FirebaseFirestore db;
+  private FirebaseUser user;
+
   TextInputEditText inputGameName;
   Button saveNameButton;
   Button cancelButton;
@@ -60,7 +65,7 @@ public class EditActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_edit);
     // access database
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    db = FirebaseFirestore.getInstance();
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
     Intent intent = getIntent();
@@ -82,7 +87,7 @@ public class EditActivity extends AppCompatActivity {
 
 
     mAuthStateListener = firebaseAuth -> {
-        FirebaseUser user = firebaseAuth.getCurrentUser();
+        user = firebaseAuth.getCurrentUser();
         if (user != null) {
             String uid = user.getUid();
             fetchUsername(uid)
@@ -177,17 +182,43 @@ public class EditActivity extends AppCompatActivity {
         // Set up click listeners for the buttons
         saveNameButton.setOnClickListener(v -> {
             // catch game name input
-            createdGame.setName(inputGameName.getText().toString());
-            saveNonogramToFireStore(createdGame.getName(),
-                    createdGame.getWidth(),
-                    createdGame.getHeight(),
-                    rowString,
-                    colString,
-                    solutionString,
-                    createdGame.getCreator(),
-                    createdGame.getLikedNum(),
-                    createdGame.getCreateTime());
-            addGameToUserCreatedGames(createdGame.getName());
+            String gameName = inputGameName.getText().toString() + "_" + creator;
+            checkGameName(gameName)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            int result = task.getResult();
+                            if (result == -1) {
+                                Toast.makeText(this, "Game name already exists", Toast.LENGTH_LONG).show();
+                            } else if (result == 1) {
+                                createdGame.setName(gameName);
+                                saveNonogramToFireStore(createdGame.getName(),
+                                        createdGame.getWidth(),
+                                        createdGame.getHeight(),
+                                        rowString,
+                                        colString,
+                                        solutionString,
+                                        createdGame.getCreator(),
+                                        createdGame.getLikedNum(),
+                                        createdGame.getCreateTime())
+                                        .addOnCompleteListener(task1 -> {
+                                            if (task1.isSuccessful()) {
+                                                int result1 = task1.getResult();
+                                                if (result1 == 1) {
+                                                    addGameToUserCreatedGames(createdGame.getName());
+                                                    Toast.makeText(this, "Game saved successfully", Toast.LENGTH_LONG).show();
+                                                } else if(result1 == -1){
+                                                    Toast.makeText(this, "Failed to save this game", Toast.LENGTH_LONG).show();
+                                                } else {
+                                                    Toast.makeText(this, "Failed to access this game", Toast.LENGTH_LONG).show();
+                                                }
+                                            }
+                                        });
+
+                            } else {
+                                Toast.makeText(this, "Error checking game name", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
             dialog.dismiss();
         });
 
@@ -195,5 +226,29 @@ public class EditActivity extends AppCompatActivity {
         cancelButton.setOnClickListener(v -> dialog.dismiss());
         // Show the dialog
         dialog.show();
+    }
+
+    private Task<Integer> checkGameName(String gameName) {
+        if (db == null) {
+            throw new IllegalStateException("FirebaseFirestore instance is not initialized.");
+        }
+        TaskCompletionSource<Integer> taskCompletionSource = new TaskCompletionSource<>();
+
+        db.collection("games")
+                .whereEqualTo("name", gameName)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // if game name exists
+                        if (!task.getResult().isEmpty()) {
+                            taskCompletionSource.setResult(-1);
+                        } else {
+                            taskCompletionSource.setResult(1);
+                        }
+                    } else {
+                        Toast.makeText(this, "Error checking game name", Toast.LENGTH_LONG).show();
+                    }
+                });
+        return taskCompletionSource.getTask();
     }
 }
