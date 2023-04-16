@@ -9,6 +9,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
 
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -275,7 +277,7 @@ public class NonogramUtils {
 
     return result;
   }
-  public static void saveNonogramToFireStore(
+  public static Task<Integer> saveNonogramToFireStore(
       String name,
       int width,
       int height,
@@ -286,6 +288,7 @@ public class NonogramUtils {
       int likedNum,
       String createTime) {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+    TaskCompletionSource<Integer> taskCompletionSource = new TaskCompletionSource<>();
 
     SerializableNonogram serializableGame =
         new SerializableNonogram(
@@ -305,11 +308,14 @@ public class NonogramUtils {
         .addOnSuccessListener(
             aVoid -> {
               Log.d("Firestore", "Nonogram saved successfully");
+              taskCompletionSource.setResult(1);
             })
         .addOnFailureListener(
             e -> {
               Log.w("Firestore", "Error saving nonogram", e);
+              taskCompletionSource.setResult(-1);
             });
+    return taskCompletionSource.getTask();
   }
 
   public static void getNonogramFromFireStore(String gameName) {

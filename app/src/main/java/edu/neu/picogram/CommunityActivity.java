@@ -48,8 +48,6 @@ public class CommunityActivity extends AppCompatActivity {
 
   public List<UserNonogram> testList;
 
-
-
   private FirebaseAuth mAuth;
   private FirebaseAuth.AuthStateListener mAuthStateListener;
   FirebaseUser user;
