@@ -342,6 +342,8 @@ public class NonogramUtils {
               return null;
             });
 
+    System.out.println(nonogramList);
+
     for (UserNonogram game : nonogramList) {
         if (game.getName().equals(gameName)) {
             return game;
