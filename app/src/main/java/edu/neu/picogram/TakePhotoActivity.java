@@ -1,5 +1,9 @@
 package edu.neu.picogram;
 
+import static edu.neu.picogram.NonogramImageConverter.convertToNonogramMatrix;
+import static edu.neu.picogram.NonogramUtils.drawNonogram;
+import static edu.neu.picogram.NonogramUtils.updateGame;
+
 import android.Manifest;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -61,7 +65,9 @@ public class TakePhotoActivity extends AppCompatActivity {
 
     private Button getPhotoButton;
 
-    private Button transformPhotoButton;
+    private Button cropPhotoButton;
+
+    private Button getGameButton;
 
     private ActivityResultLauncher<Intent> resultLauncher;
     ImageView imageView;
@@ -71,9 +77,11 @@ public class TakePhotoActivity extends AppCompatActivity {
     private Bitmap bitmap;
 
     private String photoPath;
-    Uri photoUri;
+    private Uri photoUri;
 
-    Uri contentUri;
+    private Uri contentUri;
+
+    UserNonogram userNonogram;
 
 
     // 拍照，并且保存到本地相册，显示在image View中。但是每次拍照，不会更新image View。
@@ -87,7 +95,8 @@ public class TakePhotoActivity extends AppCompatActivity {
 
         takePhotoButton = findViewById(R.id.btn_takephoto);
         getPhotoButton = findViewById(R.id.btn_getPhoto);
-        transformPhotoButton = findViewById(R.id.btn_transformPhoto);
+        cropPhotoButton = findViewById(R.id.btn_transformPhoto);
+        getGameButton = findViewById(R.id.btn_getGame);
 
         imageView = findViewById(R.id.imageView1);
         bitmap = null;
@@ -138,7 +147,6 @@ public class TakePhotoActivity extends AppCompatActivity {
                         photoUri = FileProvider.getUriForFile(TakePhotoActivity.this, "edu.neu.picogram.fileProvider", photoFile);
 
                         Log.d("photoUri", photoUri.toString());
-
                         intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
                         startActivityForResult(intent, CAMERA_REQUEST_CODE);
                         imageView.setImageURI(photoUri);
@@ -149,27 +157,21 @@ public class TakePhotoActivity extends AppCompatActivity {
             }
         });
 
-        transformPhotoButton.setOnClickListener(new View.OnClickListener() {
+        cropPhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 //                Intent intent = new Intent(TakePhotoActivity.this, TransformPhotoActivity.class);
 //                if(bitmap != null) transfromPhotoToGameArray(bitmap);
                 if (photoUri != null) {
+                    try {
+                        cropPhoto(photoUri);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
 
-                    cropPhoto(photoUri);
 
-//                    Intent intent = new Intent("com.android.camera.action.CROP");
-//                    intent.setDataAndType(photoUri, "image/*");
-//                    intent.putExtra("crop", "true");
-//                    intent.putExtra("aspectX", 1);
-//                    intent.putExtra("aspectY", 1);
-//                    intent.putExtra("outputX", 200);
-//                    intent.putExtra("outputY", 200);
-//                    intent.putExtra("scale", true);
-//                    intent.putExtra("return-data", true);
-//                    startActivityForResult(intent, 3);
                 } else
-                    Toast.makeText(TakePhotoActivity.this, "Please take a photo first!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TakePhotoActivity.this, "Please take a photo firstly!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -180,11 +182,29 @@ public class TakePhotoActivity extends AppCompatActivity {
                     contentUri = intent.getData();
                     imageView.setImageURI(contentUri);
                 }
-
-
             }
         });
 
+        getGameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                Intent intent = new Intent(TakePhotoActivity.this, GameActivity.class);
+//                startActivity(intent);
+                if (bitmap != null) {
+                    userNonogram = new UserNonogram();
+                    int size = 50;
+                    int[][] gameArray = convertToNonogramMatrix(bitmap, size);
+                    userNonogram.setSolution(gameArray);
+                    userNonogram.setHeight(size);
+                    userNonogram.setWidth(size);
+
+                    bitmap = drawNonogram(userNonogram);
+                    imageView.setImageBitmap(bitmap);
+
+                } else
+                    Toast.makeText(TakePhotoActivity.this, "Please take a photo firstly!", Toast.LENGTH_SHORT).show();
+            }
+        });
 
     }
 
@@ -218,13 +238,13 @@ public class TakePhotoActivity extends AppCompatActivity {
 
     private void transfromPhotoToGameArray(Bitmap bitmap) {
 
-        boolean[][] gameArray = new NonogramImageConverter().convertToNonogramMatrix(bitmap, 10);
+        int[][] gameArray = new NonogramImageConverter().convertToNonogramMatrix(bitmap, 10);
 
         String[] gameArrayString = new String[10];
         //打印gameArray
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
-                if (gameArray[i][j]) gameArrayString[i] += "1";
+                if (gameArray[i][j] == 1) gameArrayString[i] += "1";
                 else gameArrayString[i] += "0";
             }
         }
@@ -235,7 +255,21 @@ public class TakePhotoActivity extends AppCompatActivity {
         }
     }
 
+    public void createGameByBitMap(Uri bitmapUri) {
+        int[][] gameArray = new NonogramImageConverter().convertToNonogramMatrix(bitmap, 50);
 
+        UserNonogram userNonogram = new UserNonogram();
+        userNonogram.setCurrentGrid(gameArray);
+        updateGame(userNonogram);
+
+        Intent intent = new Intent(TakePhotoActivity.this, EditActivity.class);
+
+        intent.putExtra("BitmapUri", bitmapUri);
+        // 传递context
+        intent.putExtra("context", "TakePhotoActivity");
+
+        startActivity(intent);
+    }
 
 
     @Override
@@ -267,22 +301,22 @@ public class TakePhotoActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            try {
-                saveToAlbum(imageBitmap);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+//            try {
+//                saveToAlbum(bitmap);
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
         }
 
         if (requestCode == CROP_REQUEST_CODE && resultCode == RESULT_OK) {
-//            Bundle extras = data.getExtras();
-//            if(extras != null) bitmap = extras.getParcelable("data");
-//            Uri uri = data.getData();
-//            photoUri = uri;
-//            imageView.setImageURI(photoUri);
+            Bundle extras = data.getExtras();
+            if (extras != null) bitmap = extras.getParcelable("data");
+            Uri uri = data.getData();
+            photoUri = uri;
+            imageView.setImageURI(photoUri);
 
 
-            if(contentUri != null) imageView.setImageURI(contentUri);
+            if (contentUri != null) imageView.setImageURI(contentUri);
 
         }
     }
@@ -314,7 +348,7 @@ public class TakePhotoActivity extends AppCompatActivity {
     }
 
 
-    private void cropPhoto(Uri uri) {
+    private void cropPhoto(Uri uri) throws IOException {
         //在7.0以上系统裁剪完毕之后，会提示“无法保存经过裁剪的图片”
         //这是因为，我们在7.0以上跨文件传输uri时候，需要用FileProvider,但是这里需要用
         //Uri.fromFile(file)生成的，而不是使用FileProvider.getUriForFile
@@ -329,7 +363,7 @@ public class TakePhotoActivity extends AppCompatActivity {
         //                File files = creatFile(mBitmap);//变成文件
         //                ...后续根据需要来...
         //}
-        contentUri = Uri.fromFile(new File(getPhotoPath()));
+        contentUri = Uri.fromFile(createImageFile());
         Intent intent = new Intent("com.android.camera.action.CROP");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             //Android 7.0需要临时添加读取Url的权限， 添加此属性是为了解决：调用裁剪框时候提示：图片无法加载或者加载图片失败或者无法加载此图片
@@ -345,16 +379,16 @@ public class TakePhotoActivity extends AppCompatActivity {
         //当用户用手拉伸裁剪框时候，裁剪框会按照上述比例缩放。
         intent.putExtra("outputX", 300);//属性控制裁剪完毕，保存的图片的大小格式。
         intent.putExtra("outputY", 300);//你按照1:1的比例来裁剪的，如果最后成像是800*400，那么按照2:1的样式保存，
-        intent.putExtra("outputFormat",Bitmap.CompressFormat.JPEG.toString());//输出裁剪文件的格式
+        intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());//输出裁剪文件的格式
         intent.putExtra("return-data", true);//是否返回裁剪后图片的Bitmap
         intent.putExtra(MediaStore.EXTRA_OUTPUT, contentUri);//设置输出路径
-        startActivityForResult(intent, CROP_REQUEST_CODE);
+//        startActivityForResult(intent, CROP_REQUEST_CODE);
         resultLauncher.launch(intent);
     }
 
-    private String getPhotoPath() {
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/crop_photo.jpg";
-        return path;
+    private String getPhotoPath() throws IOException {
+        File file = createImageFile();
+        return file.getAbsolutePath();
     }
 
 

@@ -10,31 +10,34 @@ import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 
 public class NonogramImageConverter {
-  public static boolean[][] convertToNonogramMatrix(String imagePath, int targetSize) {
+  public static int[][] convertToNonogramMatrix(String imagePath, int targetSize) {
     Bitmap originalBitmap = BitmapFactory.decodeFile(imagePath);
     Bitmap grayscaleBitmap = convertToGrayscale(originalBitmap);
     Bitmap resizedBitmap = resizeAndCropImage(grayscaleBitmap, targetSize);
     Bitmap edgeBitmap = detectEdges(resizedBitmap);
-    boolean[][] binaryMatrix = imageToBinaryMatrix(edgeBitmap);
+    int[][] binaryMatrix = imageToBinaryMatrix(edgeBitmap);
     return binaryMatrix;
   }
 
-  public static boolean[][] convertToNonogramMatrix(Bitmap bitmap, int targetSize) {
+  // 用这个方法
+  public static int[][] convertToNonogramMatrix(Bitmap bitmap, int targetSize) {
     Bitmap grayscaleBitmap = convertToGrayscale(bitmap);
     Bitmap resizedBitmap = resizeAndCropImage(grayscaleBitmap, targetSize);
-    Bitmap edgeBitmap = detectEdges(resizedBitmap);
-    boolean[][] binaryMatrix = imageToBinaryMatrix(edgeBitmap);
+//    Bitmap edgeBitmap = detectEdges(resizedBitmap);
+
+//    int[][] binaryMatrix = imageToBinaryMatrix(edgeBitmap);
+    int[][] binaryMatrix = imageToBinaryMatrix(resizedBitmap);
     return binaryMatrix;
   }
 
-  public static boolean[][] convertToNonogramMatrix(
+  public static int[][] convertToNonogramMatrix(
       Context context, int resources, int targetSize) {
     Bitmap originalBitmap = BitmapFactory.decodeResource(context.getResources(), resources);
     Bitmap grayscaleBitmap = convertToGrayscale(originalBitmap);
     Bitmap resizedBitmap = resizeAndCropImage(grayscaleBitmap, targetSize);
     //    Bitmap edgeBitmap = detectEdges(resizedBitmap);
     //    boolean[][] binaryMatrix = imageToBinaryMatrix(edgeBitmap);
-    boolean[][] binaryMatrix = imageToBinaryMatrix(resizedBitmap);
+    int[][] binaryMatrix = imageToBinaryMatrix(resizedBitmap);
     return binaryMatrix;
   }
 
@@ -121,15 +124,16 @@ public class NonogramImageConverter {
     return edgeBitmap;
   }
 
-  private static boolean[][] imageToBinaryMatrix(Bitmap edgeBitmap) {
+
+  private static int[][] imageToBinaryMatrix(Bitmap edgeBitmap) {
     int width = edgeBitmap.getWidth();
     int height = edgeBitmap.getHeight();
-    boolean[][] binaryMatrix = new boolean[height][width];
+    int[][] binaryMatrix = new int[height][width];
 
     for (int y = 0; y < height; y++) {
       for (int x = 0; x < width; x++) {
         int pixel = edgeBitmap.getPixel(x, y);
-        binaryMatrix[y][x] = Color.red(pixel) > 128;
+        binaryMatrix[y][x] = Color.red(pixel) > 128 ? 1 : 0;
       }
     }
 

@@ -8,6 +8,8 @@ import static edu.neu.picogram.NonogramUtils.saveGame;
 import static edu.neu.picogram.NonogramUtils.saveNonogramToFireStore;
 
 import android.app.AlertDialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -53,6 +55,10 @@ public class EditActivity extends AppCompatActivity {
   Button saveNameButton;
   Button cancelButton;
 
+  NonogramView nonogramView;
+
+  Uri bitmapUri;
+
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +67,23 @@ public class EditActivity extends AppCompatActivity {
     // access database
     db = FirebaseFirestore.getInstance();
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
+    Intent intent = getIntent();
+    if (intent.getData() != null) {
+          bitmapUri = intent.getParcelableExtra("BitmapUri");
+          // 使用Uri数据进行操作
+    }
+
+    if(bitmapUri != null){
+        Log.d(TAG, "uri is not null");
+        UserNonogram userNonogram = new UserNonogram();
+//        userNonogram.setBitmapUri(bitmapUri);
+    }
+    else{
+        Log.d(TAG, "uri is null");
+    }
+
+
 
 
     mAuthStateListener = firebaseAuth -> {
@@ -79,7 +102,7 @@ public class EditActivity extends AppCompatActivity {
           }
       };
     mAuth.addAuthStateListener(mAuthStateListener);
-    NonogramView nonogramView = findViewById(R.id.nonogramView);
+    nonogramView = findViewById(R.id.nonogramView);
     nonogramView.setEditMode(true);
     // 创建一个全0的5*5的游戏，作为初始状态，传入NonogramEditView
     width = 5;
