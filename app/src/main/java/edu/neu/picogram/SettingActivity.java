@@ -1,9 +1,12 @@
 package edu.neu.picogram;
 
+import static android.content.ContentValues.TAG;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -11,15 +14,17 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import edu.neu.picogram.gamedata.NonogramGameConstants;
+import java.util.Objects;
+
 
 public class SettingActivity extends AppCompatActivity {
 
@@ -29,6 +34,7 @@ public class SettingActivity extends AppCompatActivity {
           signOutButton, helpButton;
   private ImageButton homeButton;
   private FirebaseFirestore db;
+  private FirebaseUser user;
 
   private TextView tv_signInOn;
   @Override
@@ -48,14 +54,14 @@ public class SettingActivity extends AppCompatActivity {
     db = FirebaseFirestore.getInstance();
 
     mAuthStateListener = firebaseAuth -> {
-      FirebaseUser user = firebaseAuth.getCurrentUser();
+      user = firebaseAuth.getCurrentUser();
       if (user != null) {
         signInOptionButton.setVisibility(View.GONE);
         createAccountOptionButton.setVisibility(View.GONE);
         signOutButton.setVisibility(View.VISIBLE);
         String uid = user.getUid();
         getUserFromFirestore(uid);
-        fetchUsername(user.getUid());
+        fetchUsername(uid);
       }
     };
 
@@ -132,7 +138,19 @@ public class SettingActivity extends AppCompatActivity {
       String userName = et_userName.getText().toString();
 
       if (!email.isEmpty() && !password.isEmpty() && !userName.isEmpty()) {
-        createAccount(email, password, userName);
+        checkUsernameAndEmail(userName, email)
+                .addOnCompleteListener(task -> {
+                  if (task.isSuccessful()) {
+                    int result = task.getResult();
+                    if (result == -1) {
+                      Toast.makeText(this, "Username or email already exists", Toast.LENGTH_LONG).show();
+                    } else if (result == 1) {
+                      createAccount(email, password, userName);
+                    } else {
+                      Toast.makeText(this, "Failed to save user's info", Toast.LENGTH_LONG).show();
+                    }
+                  }
+                });
         createAccountDialog.dismiss();
       } else {
         Toast.makeText(this, "Please fill out all fields!", Toast.LENGTH_LONG).show();
@@ -141,8 +159,7 @@ public class SettingActivity extends AppCompatActivity {
   }
 
   private void createAccount(String email, String password, String userName) {
-    mAuth
-            .createUserWithEmailAndPassword(email, password)
+    mAuth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(
                     this,
                     task -> {
@@ -173,8 +190,6 @@ public class SettingActivity extends AppCompatActivity {
                                    List<String> collectedGameList,
                                    List<String> likedGameList,
                                    List<String> creationGameList ) {
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
-
     User user = new User(username, email,
             playedSmallGameList,
             playedLargeGameList,
@@ -182,7 +197,8 @@ public class SettingActivity extends AppCompatActivity {
             likedGameList,
             creationGameList);
 
-    db.collection("users").document(uid)
+    db.collection("users")
+            .document(uid)
             .set(user)
             .addOnSuccessListener(aVoid -> {
               Toast.makeText(this, "User's info saved successfully", Toast.LENGTH_SHORT).show();
@@ -193,7 +209,6 @@ public class SettingActivity extends AppCompatActivity {
   }
 
   private void getUserFromFirestore(String uid) {
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
     db.collection("users").document(uid)
             .get()
             .addOnSuccessListener(documentSnapshot -> {
@@ -212,6 +227,44 @@ public class SettingActivity extends AppCompatActivity {
             });
   }
 
+  // check if username or email already exist or not
+  // if there is a duplicate, return -1
+  // if all things are valid, return 1
+  private Task<Integer> checkUsernameAndEmail(String username, String email) {
+    TaskCompletionSource<Integer> taskCompletionSource = new TaskCompletionSource<>();
+
+    db.collection("users")
+            .whereEqualTo("username", username)
+            .get()
+            .addOnCompleteListener(task -> {
+              if (task.isSuccessful()) {
+                if (!task.getResult().isEmpty()) {
+                  taskCompletionSource.setResult(-1);
+                } else {
+                  db.collection("users")
+                          .whereEqualTo("email", email)
+                          .get()
+                          .addOnCompleteListener(task2 -> {
+                            if (task2.isSuccessful()) {
+                              if (!task2.getResult().isEmpty()) {
+                                taskCompletionSource.setResult(-1);
+                              } else {
+                                taskCompletionSource.setResult(1);
+                              }
+                            } else {
+                              Log.w(TAG, "Error checking email", task2.getException());
+                              taskCompletionSource.setException(Objects.requireNonNull(task2.getException()));
+                            }
+                          });
+                }
+              } else {
+                Log.w(TAG, "Error checking username", task.getException());
+                taskCompletionSource.setException(Objects.requireNonNull(task.getException()));
+              }
+            });
+
+    return taskCompletionSource.getTask();
+  }
 
   private void signOutAccount() {
     mAuth.signOut();
