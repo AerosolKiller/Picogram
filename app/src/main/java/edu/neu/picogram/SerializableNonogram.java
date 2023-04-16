@@ -4,7 +4,6 @@ import java.util.List;
 
 public class SerializableNonogram {
     private String name;
-    private String gameId;
     private int width;
     private int height;
     private String creator;
@@ -17,7 +16,6 @@ public class SerializableNonogram {
     private String currentGrid;
 
     public SerializableNonogram(String name,
-                                String gameId,
                                 int width,
                                 int height,
                                 String rowClues,
@@ -28,7 +26,6 @@ public class SerializableNonogram {
                                 String createTime
                                 ) {
         this.name = name;
-        this.gameId = gameId;
         this.width = width;
         this.height = height;
         this.rowClues = rowClues;
@@ -37,14 +34,6 @@ public class SerializableNonogram {
         this.createTime = createTime;
         this.creator = creator;
         this.likedNum = likedNum;
-        this.currentGrid = currentGrid;
-    }
-    public String getGameId() {
-        return gameId;
-    }
-
-    public void setGameId(String gameId) {
-        this.gameId = gameId;
     }
     public String getCreator() {
     return creator;

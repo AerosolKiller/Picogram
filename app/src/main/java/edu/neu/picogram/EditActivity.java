@@ -156,7 +156,6 @@ public class EditActivity extends AppCompatActivity {
             // catch game name input
             createdGame.setName(inputGameName.getText().toString());
             saveNonogramToFireStore(createdGame.getName(),
-                    createdGame.getGameId(),
                     createdGame.getWidth(),
                     createdGame.getHeight(),
                     rowString,
@@ -165,7 +164,7 @@ public class EditActivity extends AppCompatActivity {
                     createdGame.getCreator(),
                     createdGame.getLikedNum(),
                     createdGame.getCreateTime());
-            addGameToUserCreatedGames(createdGame.getGameId());
+            addGameToUserCreatedGames(createdGame.getName());
             dialog.dismiss();
         });
 

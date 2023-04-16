@@ -8,4 +8,5 @@
     <string name="sign_out">Sign out</string>
     <string name="sign_in">Sign In</string>
     <string name="text_label">Please login firstly!</string>
+    <string name="new_username">New Username</string>
 </resources>

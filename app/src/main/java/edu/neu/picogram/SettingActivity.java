@@ -142,29 +142,29 @@ public class SettingActivity extends AppCompatActivity {
 
   private void createAccount(String email, String password, String userName) {
     mAuth
-        .createUserWithEmailAndPassword(email, password)
-        .addOnCompleteListener(
-            this,
-            task -> {
-              if (task.isSuccessful()) {
-                FirebaseUser user = mAuth.getCurrentUser();
-                String uid = user.getUid();
+            .createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener(
+                    this,
+                    task -> {
+                      if (task.isSuccessful()) {
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        String uid = user.getUid();
 
-                List<String> playedSmallGameList = new ArrayList<>();
-                List<String> playedLargeGameList = new ArrayList<>();
-                List<String> likedGameList = new ArrayList<>();
-                List<String> collectedGameList = new ArrayList<>();
-                List<String> creationGameList = new ArrayList<>();
-                saveUserToFireStore(uid, userName, email,
-                        playedSmallGameList,
-                        playedLargeGameList,
-                        collectedGameList,
-                        likedGameList,
-                        creationGameList);
-              } else {
-                Toast.makeText(this, "Account creation failed", Toast.LENGTH_SHORT).show();
-              }
-            });
+                        List<String> playedSmallGameList = new ArrayList<>();
+                        List<String> playedLargeGameList = new ArrayList<>();
+                        List<String> likedGameList = new ArrayList<>();
+                        List<String> collectedGameList = new ArrayList<>();
+                        List<String> creationGameList = new ArrayList<>();
+                        saveUserToFireStore(uid, userName, email,
+                                playedSmallGameList,
+                                playedLargeGameList,
+                                collectedGameList,
+                                likedGameList,
+                                creationGameList);
+                      } else {
+                        Toast.makeText(this, "Account creation failed", Toast.LENGTH_SHORT).show();
+                      }
+                    });
   }
 
   private void saveUserToFireStore(String uid, String username, String email,

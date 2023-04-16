@@ -13,11 +13,9 @@ public class UserNonogram extends Nonogram{
     // 如果需要也可以添加新的参数和方法
     private String creator;
     private int likedNum;
-    private String gameId;
     // 时间参数
     private String createTime;
 
-    public UserNonogram() {}
     public UserNonogram(String name,
                         String creator,
                         int likedNum,
@@ -28,21 +26,12 @@ public class UserNonogram extends Nonogram{
                         int[][] colClues,
                         int[][] solution) {
         super(name, width, height, rowClues, colClues, solution);
-        this.gameId = UUID.randomUUID().toString();
         this.creator = creator;
         this.likedNum = likedNum;
         this.createTime = createTime;
     }
 
     public UserNonogram(){}
-
-    public String getGameId() {
-        return gameId;
-    }
-
-    public void setGameId(String gameId) {
-        this.gameId = gameId;
-    }
 
     public String getCreator() {
         return creator;
@@ -73,8 +62,7 @@ public class UserNonogram extends Nonogram{
     public String toString() {
         return "UserNonogram{" +
                 "creator='" + creator + '\'' +
-                ", likedNum=" + likedNum +
-                ", gameId='" + gameId + '\'' +
+                ", likedNum=" + likedNum + '\'' +
                 ", createTime='" + createTime + '\'' +
                 '}';
     }
@@ -87,16 +75,17 @@ public class UserNonogram extends Nonogram{
         int width = (document.getLong("width")).intValue();
         int height = (document.getLong("height")).intValue();
         String rowCluesString = document.getString("rowClues");
+        assert rowCluesString != null;
         int[][] rowClues = convertStringToArray(rowCluesString, width, height);
         String colCluesString = document.getString("colClues");
+        assert colCluesString != null;
         int[][] colClues = convertStringToArray(colCluesString, width, height);
         String solutionString = document.getString("solution");
+        assert solutionString != null;
         int[][] solution = convertStringToArray(solutionString, width, height);
 
-        UserNonogram game = new UserNonogram(name,
+        return new UserNonogram(name,
                 creator,
                 likedNum, createTime, width, height, rowClues, colClues, solution);
-
-        return game;
     }
 }

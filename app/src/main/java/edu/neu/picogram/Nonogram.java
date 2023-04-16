@@ -12,7 +12,7 @@ public class Nonogram {
   public Nonogram() {}
 
   public Nonogram(
-      String name, int width, int height, int[][] rowClues, int[][] colClues, int[][] solution) {
+          String name, int width, int height, int[][] rowClues, int[][] colClues, int[][] solution) {
     // 初始化游戏，储存游戏的宽高，行列提示，解，以及当前游戏的状态
     this.name = name;
     this.width = width;
@@ -40,13 +40,13 @@ public class Nonogram {
   }
 
   public Nonogram(
-      String name,
-      int width,
-      int height,
-      int[][] rowClues,
-      int[][] colClues,
-      int[][] solution,
-      int[][] currentGrid) {
+          String name,
+          int width,
+          int height,
+          int[][] rowClues,
+          int[][] colClues,
+          int[][] solution,
+          int[][] currentGrid) {
     // 初始化游戏，储存游戏的宽高，行列提示，解，以及当前游戏的状态
     this(name, width, height, rowClues, colClues, solution);
     this.currentGrid = currentGrid;

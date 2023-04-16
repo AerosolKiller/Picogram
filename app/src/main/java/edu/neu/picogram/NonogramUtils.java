@@ -253,23 +253,30 @@ public class NonogramUtils {
 
   // 转换strings 到 2d array
   public static int[][] convertStringToArray(String string, int rows, int cols) {
-    if (!string.isEmpty()) {
-      String[] rowStrings = string.split("; ");
-      int[][] array = new int[rows][cols];
+    int[][] result = new int[rows][cols];
+    String[] rowStrings = string.split(";");
 
-      for (int i = 0; i < rowStrings.length; i++) {
-        String[] colStrings = rowStrings[i].split(", ");
-        for (int j = 0; j < colStrings.length; j++) {
-          array[i][j] = Integer.parseInt(colStrings[j]);
+    int rowIndex = 0;
+    for (String rowString : rowStrings) {
+      rowString = rowString.trim();
+
+      if (rowString.isEmpty()) {
+        for (int j = 0; j < cols; j++) {
+          result[rowIndex][j] = 0;
+        }
+      } else {
+        String[] elementStrings = rowString.split(",");
+        for (int j = 0; j < elementStrings.length; j++) {
+          result[rowIndex][j] = Integer.parseInt(elementStrings[j].trim());
         }
       }
-      return array;
+      rowIndex++;
     }
-    throw new IllegalArgumentException("Empty string encountered, cannot convert to a number.");
+
+    return result;
   }
   public static void saveNonogramToFireStore(
       String name,
-      String gameId,
       int width,
       int height,
       String rowClues,
@@ -283,7 +290,6 @@ public class NonogramUtils {
     SerializableNonogram serializableGame =
         new SerializableNonogram(
             name,
-            gameId,
             width,
             height,
             rowClues,
@@ -294,7 +300,7 @@ public class NonogramUtils {
             createTime);
 
     db.collection("games")
-        .document(gameId)
+        .document(name)
         .set(serializableGame)
         .addOnSuccessListener(
             aVoid -> {
@@ -354,11 +360,11 @@ public class NonogramUtils {
     return nonogramList;
   }
 
-  public static void addPlayedSmallGameToUser(String userId, String gameId) {
+  public static void addPlayedSmallGameToUser(String userId, String name) {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     db.collection("users")
         .document(userId)
-        .update("playedSmallGameList", FieldValue.arrayUnion(gameId))
+        .update("playedSmallGameList", FieldValue.arrayUnion(name))
         .addOnSuccessListener(
             aVoid -> {
               Log.d("Firestore", "Played game added successfully");
@@ -369,7 +375,7 @@ public class NonogramUtils {
             });
   }
 
-  public static void addGameToUserCreatedGames(String gameId) {
+  public static void addGameToUserCreatedGames(String name) {
     FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
     if (currentUser != null) {
       String userId = currentUser.getUid();
@@ -377,7 +383,7 @@ public class NonogramUtils {
 
       DocumentReference userRef = db.collection("users").document(userId);
       userRef
-          .update("creationGameList", FieldValue.arrayUnion(gameId))
+          .update("creationGameList", FieldValue.arrayUnion(name))
           .addOnSuccessListener(
               aVoid -> Log.d(TAG, "Successfully added gameId to user's createdGames"))
           .addOnFailureListener(e -> Log.e(TAG, "Failed to add gameId to user's createdGames", e));
@@ -391,7 +397,6 @@ public class NonogramUtils {
 
     NonogramUtils.saveNonogramToFireStore(
         game.getName(),
-        game.getGameId(),
         game.getWidth(),
         game.getHeight(),
         rowCluesList,
@@ -402,10 +407,10 @@ public class NonogramUtils {
         game.getCreateTime());
   }
 
-  public static void saveCreator(String userName, String gameId) {
+  public static void saveCreator(String userName, String name) {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     db.collection("games")
-        .document(gameId)
+        .document(name)
         .update("creator", userName)
         .addOnSuccessListener(
             aVoid -> {
