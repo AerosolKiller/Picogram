@@ -4,6 +4,7 @@ import static android.content.ContentValues.TAG;
 import static edu.neu.picogram.CommunityActivity.getUserFromFirestore;
 import static edu.neu.picogram.CommunityActivity.user;
 import static edu.neu.picogram.NonogramUtils.drawNonogram;
+import static edu.neu.picogram.NonogramUtils.getLikedNumFromFirestore;
 import static edu.neu.picogram.NonogramUtils.getNonogramListFromFireStore;
 import static edu.neu.picogram.gamedata.UserNonogramConstants.getUserGames;
 
@@ -318,6 +319,15 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
 
                     userRef.update("likedNum", FieldValue.increment(1));
                     holder.likeButton.setImageResource(R.drawable.baseline_thumb_up_alt_24);
+
+                    getLikedNumFromFirestore(nonogram.getName())
+                            .thenAccept(likedNum -> {
+                              holder.likeNum.setText(String.valueOf(likedNum));
+                            })
+                            .exceptionally( e-> {
+                                      Log.w(TAG, "Error getting likedNum", e);
+                                      return null;
+                                    });
                     isLiked = true;
                   } else{
                     // 把当前的nonogram从likedGameList里面删除
@@ -328,6 +338,14 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
 
                     userRef.update("likedNum", FieldValue.increment(-1));
                     holder.likeButton.setImageResource(R.drawable.baseline_thumb_up_off_alt_24);
+                    getLikedNumFromFirestore(nonogram.getName())
+                            .thenAccept(likedNum -> {
+                              holder.likeNum.setText(String.valueOf(likedNum));
+                            })
+                            .exceptionally( e-> {
+                              Log.w(TAG, "Error getting likedNum", e);
+                              return null;
+                            });
                     isLiked = false;
                   }
                 })

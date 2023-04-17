@@ -269,13 +269,26 @@ public class NonogramUtils {
       rowString = rowString.trim();
 
       if (rowString.isEmpty()) {
-        for (int j = 0; j < cols; j++) {
-          result[rowIndex][j] = 0;
-        }
+        result[rowIndex][0] = 0;
+//        for (int j = 1; j < cols; j++) {
+//          result[rowIndex][j] = -1;
+//        }
       } else {
         String[] elementStrings = rowString.split(",");
+        int colIndex = 0;
         for (int j = 0; j < elementStrings.length; j++) {
-          result[rowIndex][j] = Integer.parseInt(elementStrings[j].trim());
+          String element = elementStrings[j].trim();
+          if (element.isEmpty()) {
+            result[rowIndex][colIndex] = 0;
+            colIndex++;
+          } else {
+            result[rowIndex][colIndex] = Integer.parseInt(element);
+            colIndex++;
+          }
+        }
+        while (colIndex < cols) {
+          //result[rowIndex][colIndex] = -1;
+          colIndex++;
         }
       }
       rowIndex++;
@@ -283,6 +296,7 @@ public class NonogramUtils {
 
     return result;
   }
+
   public static Task<Integer> saveNonogramToFireStore(
       String name,
       int width,
@@ -454,6 +468,35 @@ public class NonogramUtils {
             });
 
     return completableFuture;
+  }
+
+  public static CompletableFuture<Integer> getLikedNumFromFirestore(String gameName) {
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    if (db == null) {
+      throw new IllegalStateException("FirebaseFirestore instance is not initialized.");
+    }
+
+    CompletableFuture<Integer> future = new CompletableFuture<>();
+
+    db.collection("games")
+            .document(gameName)
+            .get()
+            .addOnCompleteListener(task -> {
+              if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                  Integer likedNum = document.getLong("likedNum").intValue();
+                  future.complete(likedNum);
+                } else {
+                  future.completeExceptionally(new Exception("Game not found."));
+                }
+              } else {
+                Log.w(TAG, "Error getting likedNum", task.getException());
+                future.completeExceptionally(task.getException());
+              }
+            });
+
+    return future;
   }
 
 //  public static User getCurrentUser() {
