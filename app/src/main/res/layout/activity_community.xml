@@ -98,14 +98,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageButton1" />
 
-    <Switch
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:showText="true"
-        android:textOff="new"
-        android:textOn="popularity"
-        app:layout_constraintBottom_toBottomOf="@+id/favorite"
-        app:layout_constraintStart_toEndOf="@+id/newest" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

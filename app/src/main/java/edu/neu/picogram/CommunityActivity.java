@@ -250,6 +250,10 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
     UserNonogram nonogram = nonogramList.get(position);
     holder.setData(nonogram);
 
+    // get the user likedgameList, compare with the nonogram name, if the nonogram is in the list, then set the like button to be red.
+
+    // if not, set the like button to be white
+
     holder.imageView.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -264,6 +268,10 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
     holder.likeButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick (View v){
+        if(user == null) {
+          Toast.makeText(context, "Please signin firstly!", Toast.LENGTH_SHORT).show();
+          return;
+        }
         String uid = user.getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         getUserFromFirestore(uid)
@@ -283,13 +291,15 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
 
                     userRef.update("likedNum", FieldValue.increment(1));
                     holder.likeButton.setImageResource(R.drawable.baseline_thumb_up_alt_24);
+                    isLiked = true;
                   } else{
 //                    user1.getLikedGameList().remove(nonogram.getName());
 //                    (nonogram).setLikedNum(nonogram.getLikedNum() - 1);
                     DocumentReference userRef = db.collection("games").document(nonogram.getName());
 
                     userRef.update("likedNum", FieldValue.increment(-1));
-                    holder.likeButton.setImageResource(R.drawable.baseline_thumb_up_alt_24);
+                    holder.likeButton.setImageResource(R.drawable.baseline_thumb_up_off_alt_24);
+                    isLiked = false;
                   }
                 })
                 .exceptionally(e -> {
@@ -311,6 +321,7 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
     private ImageView imageView;
     private TextView textView;
     private ImageButton likeButton;
+    private TextView likeNum;
 
 
     public ViewHolder(@NonNull View itemView) {
@@ -320,15 +331,17 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
       imageView = itemView.findViewById(R.id.image);
       textView = itemView.findViewById(R.id.name);
       likeButton = itemView.findViewById(R.id.like_button);
-
+      likeNum = itemView.findViewById(R.id.likedNumber);
 
     }
 
     // 绑定数据
 
-    public void setData(Nonogram nonogram) {
+    public void setData(UserNonogram nonogram) {
       imageView.setImageBitmap(drawNonogram(nonogram));
       textView.setText(nonogram.getName());
+      if(nonogram.getLikedNum() > 0) likeNum.setText(nonogram.getLikedNum() + "");
+      else likeNum.setText("0");
     }
   }
 
