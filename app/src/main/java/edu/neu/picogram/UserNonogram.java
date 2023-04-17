@@ -110,7 +110,6 @@ public class UserNonogram extends Nonogram{
         return new UserNonogram(name,
                 creator,
                 likedNum, createTime, width, height, rowClues, colClues, solution);
-
     }
 
     public void setBitmapUri(Uri bitmapUri, Context context) throws IOException {
