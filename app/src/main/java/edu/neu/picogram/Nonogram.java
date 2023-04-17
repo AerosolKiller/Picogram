@@ -134,7 +134,7 @@ public class Nonogram {
     this.currentGrid = currentGrid;
   }
 
-  //  public SerializableNonogram toSerializableNonogram() {
+    //  public SerializableNonogram toSerializableNonogram() {
   //    List<List<Integer>> rowCluesList = NonogramUtils.convertArrayToList(rowClues);
   //    List<List<Integer>> colCluesList = NonogramUtils.convertArrayToList(colClues);
   //    List<List<Integer>> solutionList = NonogramUtils.convertArrayToList(solution);

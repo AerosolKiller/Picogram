@@ -1,8 +1,10 @@
 package edu.neu.picogram;
 
+import static android.content.ContentValues.TAG;
+import static edu.neu.picogram.CommunityActivity.getUserFromFirestore;
+import static edu.neu.picogram.CommunityActivity.user;
 import static edu.neu.picogram.NonogramUtils.drawNonogram;
 import static edu.neu.picogram.NonogramUtils.getNonogramListFromFireStore;
-import static edu.neu.picogram.NonogramUtils.getUserFromFirestore;
 import static edu.neu.picogram.gamedata.UserNonogramConstants.getUserGames;
 
 import androidx.annotation.NonNull;
@@ -27,10 +29,14 @@ import android.widget.Toast;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class CommunityActivity extends AppCompatActivity {
@@ -45,13 +51,15 @@ public class CommunityActivity extends AppCompatActivity {
 
   RecyclerView recyclerView;
 
-  public List<UserNonogram> nonogramList;
+  public static List<UserNonogram> nonogramList;
 
   public List<UserNonogram> testList;
 
   private FirebaseAuth mAuth;
   private FirebaseAuth.AuthStateListener mAuthStateListener;
-  FirebaseUser user;
+  public static FirebaseUser user;
+
+  private static FirebaseFirestore db;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -64,12 +72,14 @@ public class CommunityActivity extends AppCompatActivity {
     favoriteButton = findViewById(R.id.favorite);
 
     mAuth = FirebaseAuth.getInstance();
+    db = FirebaseFirestore.getInstance();
 
     mAuthStateListener = firebaseAuth -> {
       user = firebaseAuth.getCurrentUser();
         if (user != null) {
             // User is signed in
             Log.d("TAG", "onAuthStateChanged:signed_in:" + user.getUid());
+
         } else {
             // User is signed out
             Log.d("TAG", "onAuthStateChanged:signed_out");
@@ -136,6 +146,32 @@ public class CommunityActivity extends AppCompatActivity {
     });
   }
 
+  public static CompletableFuture<User> getUserFromFirestore(String uid) {
+    db = FirebaseFirestore.getInstance();
+
+    CompletableFuture<User> future = new CompletableFuture<>();
+
+    db.collection("users")
+            .document(uid)
+            .get()
+            .addOnCompleteListener(task -> {
+              if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                  User user = document.toObject(User.class);
+                  future.complete(user);
+                } else {
+                  future.completeExceptionally(new Exception("User not found."));
+                }
+              } else {
+                Log.w(TAG, "Error getting user", task.getException());
+                future.completeExceptionally(task.getException());
+              }
+            });
+
+    return future;
+  }
+
   private void initData() {
     // List<Data> list ---> Apdater ---> setAdapter ---> 显示数据
     nonogramList = new ArrayList<>();
@@ -145,7 +181,7 @@ public class CommunityActivity extends AppCompatActivity {
     gameRepository.fetchAllGames()
             .thenAccept(games -> {
               nonogramList.addAll(games);
-//              Log.d("gameList", nonogramList.toString());
+              //Log.d("gameList", nonogramList.toString());
               CommunityAdapter adapter = new CommunityAdapter(this, nonogramList);
               //设置到Recycler view里面去
               recyclerView.setAdapter(adapter);
@@ -220,43 +256,47 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
         Intent intent = new Intent(context, GameActivity.class);
         intent.putExtra("nonogram", nonogram.getName());
         intent.putExtra("mode", "firebase");
-        intent.putExtra("index", "1");
         context.startActivity(intent);
       }
     });
 
     // set the like button click listener
-    holder.likeButton.setOnClickListener(new View.OnClickListener()
-
-    {
+    holder.likeButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick (View v){
-        // add 1 to the nonograms like number
-        User user = getUserFromFirestore();
-        boolean isLiked = false;
-        for(String gameName : user.getLikedGameList()) {
-          if (gameName.equals(nonogram.getName())) {
-            isLiked = true;
-            break;
-          }
-        }
+        String uid = user.getUid();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        getUserFromFirestore(uid)
+                .thenAccept(user1 -> {
+                  boolean isLiked = false;
+                  for(String gameName : user1.getLikedGameList()) {
+                    if (gameName.equals(nonogram.getName())) {
+                      isLiked = true;
+                      break;
+                    }
+                  }
 
-        if(!isLiked) {
-          user.getLikedGameList().add(nonogram.getName());
-//          FirebaseFirestore db = FirebaseFirestore.getInstance();
-//          db.collection("users").document(user.getEmail()).set(user);
-          ( nonogram).setLikedNum((nonogram).getLikedNum() + 1);
-//          db.collection("nonograms").document(nonogram.getName()).set(nonogram);
-          holder.likeButton.setImageResource(R.drawable.baseline_thumb_up_alt_24);
-        } else{
-            user.getLikedGameList().remove(nonogram.getName());
-            nonogram.setLikedNum(nonogram.getLikedNum() - 1);
-            holder.likeButton.setImageResource(R.drawable.baseline_thumb_up_alt_24);
-        }
+                  if(!isLiked) {
+                    //user1.getLikedGameList().add(nonogram.getName());
+                    //(nonogram).setLikedNum((nonogram).getLikedNum() + 1);
+                    DocumentReference userRef = db.collection("games").document(nonogram.getName());
 
-//        holder.likeButton.setImageResource(R.drawable.baseline_thumb_up_alt_24);
+                    userRef.update("likedNum", FieldValue.increment(1));
+                    holder.likeButton.setImageResource(R.drawable.baseline_thumb_up_alt_24);
+                  } else{
+//                    user1.getLikedGameList().remove(nonogram.getName());
+//                    (nonogram).setLikedNum(nonogram.getLikedNum() - 1);
+                    DocumentReference userRef = db.collection("games").document(nonogram.getName());
 
-    }
+                    userRef.update("likedNum", FieldValue.increment(-1));
+                    holder.likeButton.setImageResource(R.drawable.baseline_thumb_up_alt_24);
+                  }
+                })
+                .exceptionally(e -> {
+                  Log.w(TAG, "Error getting user", e);
+                  return null;
+                });
+      }
     });
   }
 

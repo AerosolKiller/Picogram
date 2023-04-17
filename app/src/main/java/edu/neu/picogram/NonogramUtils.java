@@ -2,6 +2,8 @@ package edu.neu.picogram;
 
 import static android.content.ContentValues.TAG;
 
+import static edu.neu.picogram.CommunityActivity.nonogramList;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -323,26 +325,7 @@ public class NonogramUtils {
   }
 
   public static Nonogram getNonogramFromFireStore(String gameName) {
-    // 获取数据库信息
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-    List<UserNonogram> nonogramList = new ArrayList<>();
-
-    //创建数据对象；
-    GameRepository gameRepository = new GameRepository();
-    gameRepository.fetchAllGames()
-            .thenAccept(games -> {
-              nonogramList.addAll(games);
-//              Log.d("gameList", nonogramList.toString());
-
-            })
-            .exceptionally(throwable -> {
-              // Handle any error that occurs during the fetch operation
-              Log.e("TAG", "Error fetching games: " + throwable.getMessage());
-              return null;
-            });
-
-    System.out.println(nonogramList);
+    Log.d("gameList", nonogramList.toString());
 
     for (UserNonogram game : nonogramList) {
         if (game.getName().equals(gameName)) {
@@ -350,7 +333,6 @@ public class NonogramUtils {
         }
     }
     return null;
-
   }
 
 
@@ -394,13 +376,18 @@ public class NonogramUtils {
       String userId = currentUser.getUid();
       FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-      DocumentReference userRef = db.collection("users").document(userId);
+      DocumentReference userRef = db.collection("users")
+              .document(userId);
       userRef
           .update("creationGameList", FieldValue.arrayUnion(name))
           .addOnSuccessListener(
               aVoid -> Log.d(TAG, "Successfully added gameId to user's createdGames"))
           .addOnFailureListener(e -> Log.e(TAG, "Failed to add gameId to user's createdGames", e));
     }
+  }
+
+  public static void addGameToUserLikedList() {
+
   }
 
   public static void saveGameHelper(UserNonogram game) {
@@ -487,45 +474,45 @@ public class NonogramUtils {
 
 
   // TODO: 2020/4/26 从数据库中获取当前用户的信息
-  public static User getUserFromFirestore() {
-    FirebaseAuth mAuth;
-    FirebaseAuth.AuthStateListener mAuthStateListener;
-    FirebaseFirestore db;
-    final FirebaseUser[] firebaseUser = new FirebaseUser[1];
-    final String[] uid = new String[1];
-    final User[] user = {null};
-
-    mAuth = FirebaseAuth.getInstance();
-    db = FirebaseFirestore.getInstance();
-
-    mAuthStateListener = firebaseAuth -> {
-      firebaseUser[0] = firebaseAuth.getCurrentUser();
-      if (firebaseUser[0] != null) {
-        uid[0] = firebaseUser[0].getUid();
-        fetchUsername(uid[0]);
-      }
-    };
-
-    db = FirebaseFirestore.getInstance();
-    db.collection("users").document(uid[0])
-            .get()
-            .addOnSuccessListener(documentSnapshot -> {
-              if (documentSnapshot.exists()) {
-                user[0] = documentSnapshot.toObject(User.class);
-                // Access user attributes
-                String username = user[0].getUsername();
-                String email = user[0].getEmail();
-                List<String> likedGameList = user[0].getLikedGameList();
-                List<String> collectedGameList = user[0].getCollectedGameList();
-                List<String> creationGameList = user[0].getCreationGameList();
-              }
-            })
-            .addOnFailureListener(e -> {
-              Log.d("TAG", "Error getting user", e);
-            });
-
-    return user[0];
-  }
+//  public static User getUserFromFirestore() {
+//    FirebaseAuth mAuth;
+//    FirebaseAuth.AuthStateListener mAuthStateListener;
+//    FirebaseFirestore db;
+//    final FirebaseUser[] firebaseUser = new FirebaseUser[1];
+//    final String[] uid = new String[1];
+//    final User[] user = {null};
+//
+//    mAuth = FirebaseAuth.getInstance();
+//    db = FirebaseFirestore.getInstance();
+//
+//    mAuthStateListener = firebaseAuth -> {
+//      firebaseUser[0] = firebaseAuth.getCurrentUser();
+//      if (firebaseUser[0] != null) {
+//        uid[0] = firebaseUser[0].getUid();
+//        fetchUsername(uid[0]);
+//      }
+//    };
+//
+//    db = FirebaseFirestore.getInstance();
+//    db.collection("users").document(uid[0])
+//            .get()
+//            .addOnSuccessListener(documentSnapshot -> {
+//              if (documentSnapshot.exists()) {
+//                user[0] = documentSnapshot.toObject(User.class);
+//                // Access user attributes
+//                String username = user[0].getUsername();
+//                String email = user[0].getEmail();
+//                List<String> likedGameList = user[0].getLikedGameList();
+//                List<String> collectedGameList = user[0].getCollectedGameList();
+//                List<String> creationGameList = user[0].getCreationGameList();
+//              }
+//            })
+//            .addOnFailureListener(e -> {
+//              Log.d("TAG", "Error getting user", e);
+//            });
+//
+//    return user[0];
+//  }
 
 
 
