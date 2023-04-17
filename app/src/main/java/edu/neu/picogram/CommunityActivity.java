@@ -211,6 +211,8 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
 
   private Context context;
   private List<UserNonogram> nonogramList;
+  FirebaseFirestore db;
+
 
   public CommunityAdapter(Context context, List<UserNonogram> nonogramList) {
     this.context = context;
@@ -251,7 +253,30 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
     holder.setData(nonogram);
 
     // get the user likedgameList, compare with the nonogram name, if the nonogram is in the list, then set the like button to be red.
-
+    db = FirebaseFirestore.getInstance();
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    if(user == null) {
+      holder.likeButton.setImageResource(R.drawable.baseline_thumb_up_off_alt_24);
+    }
+    else {
+      String uid = user.getUid();
+      getUserFromFirestore(uid)
+              .thenAccept(user1 -> {
+                boolean isLiked = false;
+                for(String gameName : user1.getLikedGameList()) {
+                  if(gameName.equals(nonogram.getName())) {
+                    isLiked = true;
+                    break;
+                  }
+                }
+                if(isLiked) {
+                  holder.likeButton.setImageResource(R.drawable.baseline_thumb_up_alt_24);
+                }
+                else {
+                  holder.likeButton.setImageResource(R.drawable.baseline_thumb_up_off_alt_24);
+                }
+              });
+    }
     // if not, set the like button to be white
 
     holder.imageView.setOnClickListener(new View.OnClickListener() {
@@ -287,12 +312,16 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
                   if(!isLiked) {
                     //user1.getLikedGameList().add(nonogram.getName());
                     //(nonogram).setLikedNum((nonogram).getLikedNum() + 1);
+                    // 把当前的nonogram从likedGameList里面添加
+                    db.collection("users").document(uid).update("likedGameList", FieldValue.arrayUnion(nonogram.getName()));
                     DocumentReference userRef = db.collection("games").document(nonogram.getName());
 
                     userRef.update("likedNum", FieldValue.increment(1));
                     holder.likeButton.setImageResource(R.drawable.baseline_thumb_up_alt_24);
                     isLiked = true;
                   } else{
+                    // 把当前的nonogram从likedGameList里面删除
+                    db.collection("users").document(uid).update("likedGameList", FieldValue.arrayRemove(nonogram.getName()));
 //                    user1.getLikedGameList().remove(nonogram.getName());
 //                    (nonogram).setLikedNum(nonogram.getLikedNum() - 1);
                     DocumentReference userRef = db.collection("games").document(nonogram.getName());
