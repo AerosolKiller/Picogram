@@ -6,6 +6,7 @@ import static edu.neu.picogram.NonogramUtils.convertArrayToString;
 import static edu.neu.picogram.NonogramUtils.fetchUsername;
 import static edu.neu.picogram.NonogramUtils.saveGame;
 import static edu.neu.picogram.NonogramUtils.saveNonogramToFireStore;
+import static edu.neu.picogram.NonogramUtils.updateGame;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -15,8 +16,11 @@ import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -54,11 +58,9 @@ public class EditActivity extends AppCompatActivity {
   TextInputEditText inputGameName;
   Button saveNameButton;
   Button cancelButton;
-
   NonogramView nonogramView;
-
   Uri bitmapUri;
-
+  Nonogram game;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -70,185 +72,206 @@ public class EditActivity extends AppCompatActivity {
 
     Intent intent = getIntent();
     if (intent.getData() != null) {
-          bitmapUri = intent.getParcelableExtra("BitmapUri");
-          // 使用Uri数据进行操作
+      bitmapUri = intent.getParcelableExtra("BitmapUri");
+      // 使用Uri数据进行操作
     }
 
-    if(bitmapUri != null){
-        Log.d(TAG, "uri is not null");
-        UserNonogram userNonogram = new UserNonogram();
-//        userNonogram.setBitmapUri(bitmapUri);
+    if (bitmapUri != null) {
+      Log.d(TAG, "uri is not null");
+      UserNonogram userNonogram = new UserNonogram();
+      // userNonogram.setBitmapUri(bitmapUri);
+    } else {
+      Log.d(TAG, "uri is null");
     }
-    else{
-        Log.d(TAG, "uri is null");
-    }
-
-
-
 
     mAuthStateListener = firebaseAuth -> {
-        user = firebaseAuth.getCurrentUser();
-        if (user != null) {
-            String uid = user.getUid();
-            fetchUsername(uid)
-                    .thenAccept(username -> {
-                        Log.d(TAG, "Fetched username: " + username);
-                        creator = username;
-                    })
-                    .exceptionally(throwable -> {
-                        Log.e(TAG, "Error fetching username: " + throwable.getMessage());
-                        return null;
-                    });
-          }
-      };
+      user = firebaseAuth.getCurrentUser();
+      if (user != null) {
+
+        String uid = user.getUid();
+        fetchUsername(uid)
+            .thenAccept(
+                username -> {
+                  Log.d(TAG, "Fetched username: " + username);
+                  creator = username;
+                })
+            .exceptionally(
+                throwable -> {
+                  Log.e(TAG, "Error fetching username: " + throwable.getMessage());
+                  return null;
+                });
+      }
+    };
     mAuth.addAuthStateListener(mAuthStateListener);
     nonogramView = findViewById(R.id.nonogramView);
     nonogramView.setEditMode(true);
     // 创建一个全0的5*5的游戏，作为初始状态，传入NonogramEditView
-    width = 5;
-    height = 5;
-    rowClues = new int[height][];
-    colClues = new int[width][];
-    solution = new int[width][height];
-    Nonogram game = new Nonogram("", width, height, rowClues, colClues, solution);
+    game = createEmptyGame(5, 5);
     nonogramView.setGame(game);
     // 保存按钮，点击后将游戏保存为json格式
+    Spinner spinner = findViewById(R.id.spinner);
+    ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+        this, R.array.spinner_items, android.R.layout.simple_spinner_item);
+    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    spinner.setAdapter(adapter);
+    spinner.setOnItemSelectedListener(
+        new AdapterView.OnItemSelectedListener() {
+          @Override
+          public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+            if (position == 0) {
+              game = createEmptyGame(5, 5);
+              nonogramView.setGame(game);
+            }
+            if (position == 1) {
+              game = createEmptyGame(10, 10);
+              nonogramView.setGame(game);
+            }
+          }
+
+          @Override
+          public void onNothingSelected(AdapterView<?> parent) {
+          }
+        });
+
     Button button = findViewById(R.id.saveAnswer);
     button.setOnClickListener(
         v -> {
-            // save game data
-            Nonogram newGame = nonogramView.getGame();
-            if (newGame != null) {
-                rowClues = newGame.getRowClues();
-                rowString = convertArrayToString(rowClues);
-                colClues = newGame.getColClues();
-                colString = convertArrayToString(colClues);
-                solution = newGame.getSolution();
-                solutionString = convertArrayToString(solution);
-                saveGame(gameName, rowClues, colClues, solution);
-                width = newGame.getWidth();
-                height = newGame.getHeight();
-                // create time
-                Instant instant = Instant.now();
-                DateTimeFormatter formatter =
-                        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneId.of("UTC"));
-                createTime = formatter.format(instant);
-                createdGame = new UserNonogram(gameName, creator, likedNum, createTime,
-                        width,
-                        height,
-                        rowClues,
-                        colClues,
-                        solution);
-                showSaveGameDialog();
-                //UserNonogram createdGame = new UserNonogram();
-            }
+          // save game data
+          Nonogram newGame = nonogramView.getGame();
+          if (newGame != null) {
+            createUserNonogram(newGame);
+          }
         });
-
-    //    boolean[][] solution = convertToNonogramMatrix(this, R.drawable.tutorial_img1, 200);
-    //    JSONObject jsonObject = new JSONObject();
-    //    try {
-    //      JSONArray solutionArray = new JSONArray();
-    //      for (int i = 0; i < solution.length; i++) {
-    //        JSONArray rowArray = new JSONArray();
-    //        for (int j = 0; j < solution[0].length; j++) {
-    //          rowArray.put(solution[i][j]);
-    //        }
-    //        solutionArray.put(rowArray);
-    //      }
-    //      jsonObject.put("solution", solutionArray);
-    //    } catch (Exception e) {
-    //      Log.e("EditActivity", "Error when converting solution to json");
-    //    }
-    //    savaJson(this, jsonObject, "tutorial_img1");
+    Button resetButton = findViewById(R.id.reset);
+    resetButton.setOnClickListener(
+        v -> {
+          // reset game data
+          Nonogram newGame = nonogramView.getGame();
+          if (newGame != null) {
+            newGame.setCurrentGrid(new int[newGame.getWidth()][newGame.getHeight()]);
+            updateGame(newGame);
+            nonogramView.invalidate();
+          }
+        });
   }
-        // create a dialog so users can edit their own game name
+
+  private void createUserNonogram(Nonogram newGame) {
+    rowClues = newGame.getRowClues();
+    rowString = convertArrayToString(rowClues);
+    colClues = newGame.getColClues();
+    colString = convertArrayToString(colClues);
+    solution = newGame.getSolution();
+    solutionString = convertArrayToString(solution);
+    saveGame(gameName, rowClues, colClues, solution);
+    width = newGame.getWidth();
+    height = newGame.getHeight();
+    // create time
+    Instant instant = Instant.now();
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+        .withZone(ZoneId.of("UTC"));
+    createTime = formatter.format(instant);
+    createdGame = new UserNonogram(
+        gameName, creator, likedNum, createTime, width, height, rowClues, colClues, solution);
+    showSaveGameDialog();
+    // UserNonogram createdGame = new UserNonogram();
+  }
+
+  // create a dialog so users can edit their own game name
   private void showSaveGameDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        // Inflate the dialog layout
-        LayoutInflater inflater = this.getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.saveeditgame, null);
+    // Inflate the dialog layout
+    LayoutInflater inflater = this.getLayoutInflater();
+    View dialogView = inflater.inflate(R.layout.saveeditgame, null);
 
-        // Find the input field and buttons in the dialog layout
-        inputGameName = dialogView.findViewById(R.id.gameName_edit_text);
-        saveNameButton = dialogView.findViewById(R.id.save_name_button);
-        cancelButton = dialogView.findViewById(R.id.cancel_button);
+    // Find the input field and buttons in the dialog layout
+    inputGameName = dialogView.findViewById(R.id.gameName_edit_text);
+    saveNameButton = dialogView.findViewById(R.id.save_name_button);
+    cancelButton = dialogView.findViewById(R.id.cancel_button);
 
-        // Create the dialog
-        builder.setView(dialogView);
-        AlertDialog dialog = builder.create();
-        dialog.show();
+    // Create the dialog
+    builder.setView(dialogView);
+    AlertDialog dialog = builder.create();
+    dialog.show();
 
-        // Set up click listeners for the buttons
-        saveNameButton.setOnClickListener(v -> {
-            // catch game name input
-            String gameName = inputGameName.getText().toString() + "_" + creator;
-            checkGameName(gameName)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            int result = task.getResult();
-                            if (result == -1) {
-                                Toast.makeText(this, "Game name already exists", Toast.LENGTH_LONG).show();
-                            } else if (result == 1) {
-                                createdGame.setName(gameName);
-                                saveNonogramToFireStore(createdGame.getName(),
-                                        createdGame.getWidth(),
-                                        createdGame.getHeight(),
-                                        rowString,
-                                        colString,
-                                        solutionString,
-                                        createdGame.getCreator(),
-                                        createdGame.getLikedNum(),
-                                        createdGame.getCreateTime())
-                                        .addOnCompleteListener(task1 -> {
-                                            if (task1.isSuccessful()) {
-                                                int result1 = task1.getResult();
-                                                if (result1 == 1) {
-                                                    addGameToUserCreatedGames(createdGame.getName());
-                                                    Toast.makeText(this, "Game saved successfully", Toast.LENGTH_LONG).show();
-                                                } else if(result1 == -1){
-                                                    Toast.makeText(this, "Failed to save this game", Toast.LENGTH_LONG).show();
-                                                } else {
-                                                    Toast.makeText(this, "Failed to access this game", Toast.LENGTH_LONG).show();
-                                                }
-                                            }
-                                        });
-
-                            } else {
-                                Toast.makeText(this, "Error checking game name", Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    });
-            dialog.dismiss();
-        });
-
-        // cancel button
-        cancelButton.setOnClickListener(v -> dialog.dismiss());
-        // Show the dialog
-        dialog.show();
-    }
-
-    private Task<Integer> checkGameName(String gameName) {
-        if (db == null) {
-            throw new IllegalStateException("FirebaseFirestore instance is not initialized.");
-        }
-        TaskCompletionSource<Integer> taskCompletionSource = new TaskCompletionSource<>();
-
-        db.collection("games")
-                .whereEqualTo("name", gameName)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        // if game name exists
-                        if (!task.getResult().isEmpty()) {
-                            taskCompletionSource.setResult(-1);
+    // Set up click listeners for the buttons
+    saveNameButton.setOnClickListener(v -> {
+      // catch game name input
+      String gameName = inputGameName.getText().toString() + "_" + creator;
+      checkGameName(gameName)
+          .addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+              int result = task.getResult();
+              if (result == -1) {
+                Toast.makeText(this, "Game name already exists", Toast.LENGTH_LONG).show();
+              } else if (result == 1) {
+                createdGame.setName(gameName);
+                saveNonogramToFireStore(createdGame.getName(),
+                    createdGame.getWidth(),
+                    createdGame.getHeight(),
+                    rowString,
+                    colString,
+                    solutionString,
+                    createdGame.getCreator(),
+                    createdGame.getLikedNum(),
+                    createdGame.getCreateTime())
+                    .addOnCompleteListener(task1 -> {
+                      if (task1.isSuccessful()) {
+                        int result1 = task1.getResult();
+                        if (result1 == 1) {
+                          addGameToUserCreatedGames(createdGame.getName());
+                          Toast.makeText(this, "Game saved successfully", Toast.LENGTH_LONG).show();
+                        } else if (result1 == -1) {
+                          Toast.makeText(this, "Failed to save this game", Toast.LENGTH_LONG).show();
                         } else {
-                            taskCompletionSource.setResult(1);
+                          Toast.makeText(this, "Failed to access this game", Toast.LENGTH_LONG).show();
                         }
-                    } else {
-                        Toast.makeText(this, "Error checking game name", Toast.LENGTH_LONG).show();
-                    }
-                });
-        return taskCompletionSource.getTask();
+                      }
+                    });
+
+              } else {
+                Toast.makeText(this, "Error checking game name", Toast.LENGTH_LONG).show();
+              }
+            }
+          });
+      dialog.dismiss();
+    });
+
+    // cancel button
+    cancelButton.setOnClickListener(v -> dialog.dismiss());
+    // Show the dialog
+    dialog.show();
+  }
+
+  private Task<Integer> checkGameName(String gameName) {
+    if (db == null) {
+      throw new IllegalStateException("FirebaseFirestore instance is not initialized.");
     }
+    TaskCompletionSource<Integer> taskCompletionSource = new TaskCompletionSource<>();
+
+    db.collection("games")
+        .whereEqualTo("name", gameName)
+        .get()
+        .addOnCompleteListener(task -> {
+          if (task.isSuccessful()) {
+            // if game name exists
+            if (!task.getResult().isEmpty()) {
+              taskCompletionSource.setResult(-1);
+            } else {
+              taskCompletionSource.setResult(1);
+            }
+          } else {
+            Toast.makeText(this, "Error checking game name", Toast.LENGTH_LONG).show();
+          }
+        });
+    return taskCompletionSource.getTask();
+  }
+
+  public Nonogram createEmptyGame(int width, int height) {
+    // 创建一个全0的5*5的游戏，作为初始状态，传入NonogramEditView
+    rowClues = new int[height][];
+    colClues = new int[width][];
+    solution = new int[width][height];
+    return new Nonogram("", width, height, rowClues, colClues, solution);
+  }
 }

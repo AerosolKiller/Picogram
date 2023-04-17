@@ -3,7 +3,6 @@ package edu.neu.picogram;
 import static edu.neu.picogram.NonogramUtils.addPlayedSmallGameToUser;
 import static edu.neu.picogram.NonogramUtils.getNonogramFromFireStore;
 import static edu.neu.picogram.gamedata.NonogramGameConstants.getGame;
-import static edu.neu.picogram.gamedata.UserNonogramConstants.getUserGame;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
