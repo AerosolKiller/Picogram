@@ -47,10 +47,9 @@ public class GameActivity extends AppCompatActivity {
       int innerIndex = this.getIntent().getExtras().getInt("innerIndex");
       game = LargeScaleGameConstants.getGame(this, gameId, innerIndex);
     } else if(mode.equals("firebase")){
-        String gameName = this.getIntent().getExtras().getString("gameName");
+        String gameName = this.getIntent().getExtras().getString("nonogram");
         game = getNonogramFromFireStore(gameName);
-        game.setWidth(5);
-        game.setHeight(5);
+
     }
     // 读取关卡后，实际上给solution，rowClues，colClues赋值了，创建Nonogram对象
     setContentView(R.layout.activity_game);

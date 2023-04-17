@@ -37,14 +37,13 @@
         android:id="@+id/popular"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:text="Popular"
         android:onClick="onClick"
         app:layout_constraintEnd_toStartOf="@+id/newest"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/sortBy"
         app:layout_constraintTop_toBottomOf="@+id/imageButton1" />
 
     <Button
@@ -68,26 +67,45 @@
         android:layout_marginBottom="8dp"
         android:text="Favorite"
         android:onClick="onClick"
+        android:visibility="invisible"
         app:layout_constraintTop_toTopOf="@id/popular"
         app:layout_constraintStart_toEndOf="@+id/newest" />
 
 <!--    添加一个横向的recycler view, 每列有两行的item显示-->
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
-        android:orientation="horizontal"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/popular"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintVertical_bias="1.0" />
 
+    <TextView
+        android:id="@+id/sortBy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sort by: "
+        android:layout_margin="15dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageButton1" />
 
-
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:showText="true"
+        android:textOff="new"
+        android:textOn="popularity"
+        app:layout_constraintBottom_toBottomOf="@+id/favorite"
+        app:layout_constraintStart_toEndOf="@+id/newest" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

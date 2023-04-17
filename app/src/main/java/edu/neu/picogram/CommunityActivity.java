@@ -2,6 +2,7 @@ package edu.neu.picogram;
 
 import static edu.neu.picogram.NonogramUtils.drawNonogram;
 import static edu.neu.picogram.NonogramUtils.getNonogramListFromFireStore;
+import static edu.neu.picogram.NonogramUtils.getUserFromFirestore;
 import static edu.neu.picogram.gamedata.UserNonogramConstants.getUserGames;
 
 import androidx.annotation.NonNull;
@@ -63,7 +64,6 @@ public class CommunityActivity extends AppCompatActivity {
     favoriteButton = findViewById(R.id.favorite);
 
     mAuth = FirebaseAuth.getInstance();
-
 
     mAuthStateListener = firebaseAuth -> {
       user = firebaseAuth.getCurrentUser();
@@ -211,7 +211,7 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
   @Override
   public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
     // 绑定数据
-    Nonogram nonogram = nonogramList.get(position);
+    UserNonogram nonogram = nonogramList.get(position);
     holder.setData(nonogram);
 
     holder.imageView.setOnClickListener(new View.OnClickListener() {
@@ -220,6 +220,7 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
         Intent intent = new Intent(context, GameActivity.class);
         intent.putExtra("nonogram", nonogram.getName());
         intent.putExtra("mode", "firebase");
+        intent.putExtra("index", "1");
         context.startActivity(intent);
       }
     });
@@ -231,7 +232,29 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
       @Override
       public void onClick (View v){
         // add 1 to the nonograms like number
-        holder.likeButton.setImageResource(R.drawable.baseline_thumb_up_alt_24);
+        User user = getUserFromFirestore();
+        boolean isLiked = false;
+        for(String gameName : user.getLikedGameList()) {
+          if (gameName.equals(nonogram.getName())) {
+            isLiked = true;
+            break;
+          }
+        }
+
+        if(!isLiked) {
+          user.getLikedGameList().add(nonogram.getName());
+//          FirebaseFirestore db = FirebaseFirestore.getInstance();
+//          db.collection("users").document(user.getEmail()).set(user);
+          ( nonogram).setLikedNum((nonogram).getLikedNum() + 1);
+//          db.collection("nonograms").document(nonogram.getName()).set(nonogram);
+          holder.likeButton.setImageResource(R.drawable.baseline_thumb_up_alt_24);
+        } else{
+            user.getLikedGameList().remove(nonogram.getName());
+            nonogram.setLikedNum(nonogram.getLikedNum() - 1);
+            holder.likeButton.setImageResource(R.drawable.baseline_thumb_up_alt_24);
+        }
+
+//        holder.likeButton.setImageResource(R.drawable.baseline_thumb_up_alt_24);
 
     }
     });
