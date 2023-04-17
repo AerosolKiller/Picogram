@@ -260,41 +260,27 @@ public class NonogramUtils {
   }
 
   // 转换strings 到 2d array
-  public static int[][] convertStringToArray(String string, int rows, int cols) {
-    int[][] result = new int[rows][cols];
-    String[] rowStrings = string.split(";");
+  public static int[][] convertStringToArray(String input) {
+    String[] rows = input.split(";\\s*");
+    int[][] array = new int[rows.length][];
 
-    int rowIndex = 0;
-    for (String rowString : rowStrings) {
-      rowString = rowString.trim();
+    for (int i = 0; i < rows.length; i++) {
+      String[] cols = rows[i].split(",\\s*");
+      ArrayList<Integer> validCols = new ArrayList<>();
 
-      if (rowString.isEmpty()) {
-        result[rowIndex][0] = 0;
-//        for (int j = 1; j < cols; j++) {
-//          result[rowIndex][j] = -1;
-//        }
-      } else {
-        String[] elementStrings = rowString.split(",");
-        int colIndex = 0;
-        for (int j = 0; j < elementStrings.length; j++) {
-          String element = elementStrings[j].trim();
-          if (element.isEmpty()) {
-            result[rowIndex][colIndex] = 0;
-            colIndex++;
-          } else {
-            result[rowIndex][colIndex] = Integer.parseInt(element);
-            colIndex++;
-          }
-        }
-        while (colIndex < cols) {
-          //result[rowIndex][colIndex] = -1;
-          colIndex++;
+      for (String col : cols) {
+        if (!col.isEmpty()) {
+          validCols.add(Integer.parseInt(col));
         }
       }
-      rowIndex++;
+
+      array[i] = new int[validCols.size()];
+      for (int j = 0; j < validCols.size(); j++) {
+        array[i][j] = validCols.get(j);
+      }
     }
 
-    return result;
+    return array;
   }
 
   public static Task<Integer> saveNonogramToFireStore(
@@ -405,9 +391,9 @@ public class NonogramUtils {
   }
 
   public static void saveGameHelper(UserNonogram game) {
-    String rowCluesList = NonogramUtils.convertArrayToString(game.getRowClues());
-    String colCluesList = NonogramUtils.convertArrayToString(game.getColClues());
-    String solutionList = NonogramUtils.convertArrayToString(game.getSolution());
+    String rowCluesList = Arrays.deepToString(game.getRowClues());
+    String colCluesList = Arrays.deepToString(game.getColClues());
+    String solutionList = Arrays.deepToString(game.getSolution());
 
     NonogramUtils.saveNonogramToFireStore(
         game.getName(),

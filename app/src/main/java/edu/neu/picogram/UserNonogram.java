@@ -12,6 +12,7 @@ import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -98,13 +99,13 @@ public class UserNonogram extends Nonogram{
         int height = (document.getLong("height")).intValue();
         String rowCluesString = document.getString("rowClues");
         assert rowCluesString != null;
-        int[][] rowClues = convertStringToArray(rowCluesString, width, height);
+        int[][] rowClues = new Gson().fromJson(rowCluesString, int[][].class);
         String colCluesString = document.getString("colClues");
         assert colCluesString != null;
-        int[][] colClues = convertStringToArray(colCluesString, width, height);
+        int[][] colClues = new Gson().fromJson(colCluesString, int[][].class);
         String solutionString = document.getString("solution");
         assert solutionString != null;
-        int[][] solution = convertStringToArray(solutionString, width, height);
+        int[][] solution = new Gson().fromJson(solutionString, int[][].class);
 
         return new UserNonogram(name,
                 creator,

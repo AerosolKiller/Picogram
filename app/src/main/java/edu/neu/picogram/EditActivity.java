@@ -34,6 +34,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 
 public class EditActivity extends AppCompatActivity {
   private int[][] colClues;
@@ -157,11 +158,11 @@ public class EditActivity extends AppCompatActivity {
 
   private void createUserNonogram(Nonogram newGame) {
     rowClues = newGame.getRowClues();
-    rowString = convertArrayToString(rowClues);
+    rowString = Arrays.deepToString(rowClues);
     colClues = newGame.getColClues();
-    colString = convertArrayToString(colClues);
+    colString = Arrays.deepToString(colClues);
     solution = newGame.getSolution();
-    solutionString = convertArrayToString(solution);
+    solutionString = Arrays.deepToString(solution);
     saveGame(gameName, rowClues, colClues, solution);
     width = newGame.getWidth();
     height = newGame.getHeight();
