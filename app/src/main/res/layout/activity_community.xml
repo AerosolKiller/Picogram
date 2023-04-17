@@ -93,10 +93,12 @@
         android:id="@+id/sortBy"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Sort by: "
-        android:layout_margin="15dp"
+        android:text="Sort by:  "
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_margin="10dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageButton1" />
+        app:layout_constraintTop_toTopOf="@+id/newest" />
 
 
 

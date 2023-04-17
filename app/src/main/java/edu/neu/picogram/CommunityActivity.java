@@ -62,6 +62,8 @@ public class CommunityActivity extends AppCompatActivity {
 
   private static FirebaseFirestore db;
 
+  CommunityAdapter adapter = null;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -97,14 +99,16 @@ public class CommunityActivity extends AppCompatActivity {
     // 准备数据
     initData();
 
+
     // the recycler view is in horizontal mode
     LinearLayoutManager layoutManager = new GridLayoutManager(this, 2, RecyclerView.HORIZONTAL, false);
     recyclerView.setLayoutManager(layoutManager);
 
 
     // the adapter is set to the recycler view
-    CommunityAdapter adapter = new CommunityAdapter(this, nonogramList);
+    if(adapter == null) adapter = new CommunityAdapter(this, nonogramList);
     recyclerView.setAdapter(adapter);
+
 
     popularButton.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -112,6 +116,7 @@ public class CommunityActivity extends AppCompatActivity {
 
         //sortByPopularity(nonogramList);
         adapter.sortByPopular();
+        Log.d("TAG", nonogramList.toString());
         //
         adapter.notifyDataSetChanged();
 
@@ -183,7 +188,7 @@ public class CommunityActivity extends AppCompatActivity {
             .thenAccept(games -> {
               nonogramList.addAll(games);
               //Log.d("gameList", nonogramList.toString());
-              CommunityAdapter adapter = new CommunityAdapter(this, nonogramList);
+              adapter = new CommunityAdapter(this, nonogramList);
               //设置到Recycler view里面去
               recyclerView.setAdapter(adapter);
             })
