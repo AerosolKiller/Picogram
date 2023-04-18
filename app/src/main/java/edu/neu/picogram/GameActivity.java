@@ -27,6 +27,7 @@ public class GameActivity extends AppCompatActivity {
   String userId;
   int badgeCount;
   int gameId;
+  String gameName;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -45,10 +46,10 @@ public class GameActivity extends AppCompatActivity {
     } else if (mode.equals("large")) {
       int innerIndex = this.getIntent().getExtras().getInt("innerIndex");
       game = LargeScaleGameConstants.getGame(this, gameId, innerIndex);
-    } else if(mode.equals("firebase")){
-        String gameName = this.getIntent().getExtras().getString("nonogram");
-        game = getNonogramFromFireStore(gameName);
-
+      gameName = LargeScaleGameConstants.getGames(this).get(gameId).getName();
+    } else if (mode.equals("firebase")) {
+      gameName = this.getIntent().getExtras().getString("nonogram");
+      game = getNonogramFromFireStore(gameName);
     }
     // 读取关卡后，实际上给solution，rowClues，colClues赋值了，创建Nonogram对象
     setContentView(R.layout.activity_game);
@@ -130,13 +131,13 @@ public class GameActivity extends AppCompatActivity {
     } else if (mode.equals("large")) {
       sharedPreferences = getSharedPreferences("large_game_progress", MODE_PRIVATE);
       SharedPreferences.Editor editor = sharedPreferences.edit();
-      boolean isSolved = sharedPreferences.getBoolean(gameId + " " + index + "isSolved", false);
+      boolean isSolved = sharedPreferences.getBoolean(gameName + " " + index + "isSolved", false);
       if (isSolved) {
         return;
       }
-      int currentLevel = sharedPreferences.getInt(gameId + "current_level", 0);
-      editor.putInt("current_level", currentLevel + 1);
-      editor.putBoolean(gameId + " " + index + "isSolved", true);
+      int currentLevel = sharedPreferences.getInt(gameName + "current_level", 0);
+      editor.putInt(gameName + "current_level", currentLevel + 1);
+      editor.putBoolean(gameName + " " + index + "isSolved", true);
       editor.apply();
     }
   }
