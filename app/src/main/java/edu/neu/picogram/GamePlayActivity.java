@@ -1,10 +1,13 @@
 package edu.neu.picogram;
 
 import static android.content.Context.MODE_PRIVATE;
+import static edu.neu.picogram.NonogramUtils.deleteJson;
 import static edu.neu.picogram.NonogramUtils.drawNonogram;
 import static edu.neu.picogram.gamedata.NonogramGameConstants.getGames;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -113,6 +116,23 @@ class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder> {
           intent.putExtra("mode", "small");
           intent.putExtra("index", position);
           context.startActivity(intent);
+        });
+    holder.itemView.setOnLongClickListener(
+        v -> {
+          if (!mode.equals("large")) {
+            return false;
+          }
+          AlertDialog.Builder builder = new AlertDialog.Builder(context);
+          builder.setMessage("Are you sure to delete this game?")
+                  .setPositiveButton("Yes", (dialog, which) -> {
+                    // 删除数据
+                    deleteJson(context, games.get(holder.getAdapterPosition()).getName());
+                    games.remove(holder.getAdapterPosition());
+                    notifyItemRemoved(holder.getAdapterPosition());
+                  })
+                  .setNegativeButton("No", null)
+                  .show();
+          return true;
         });
     if (mode.equals("large")) {
       holder.gameImage.setImageBitmap(drawNonogram(game, 300));

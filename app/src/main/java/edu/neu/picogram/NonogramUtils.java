@@ -265,6 +265,18 @@ public class NonogramUtils {
     }
   }
 
+  public static void deleteJson(Context context, String fileName) {
+    File dir = new File(context.getExternalFilesDir(null), "nonogram");
+    File file = new File(dir, fileName + ".json");
+    if (file.exists()) {
+      boolean success = file.delete();
+      if (!success) {
+        return;
+      }
+    }
+    Log.d("NonogramUtils", "deleteJson: " + file.getAbsolutePath());
+  }
+
   // 转换int[][] 到 String
   public static String convertArrayToString(int[][] array) {
     StringBuilder stringBuilder = new StringBuilder();
