@@ -2,6 +2,8 @@ package edu.neu.picogram;
 
 import static edu.neu.picogram.NonogramImageConverter.convertToNonogramMatrix;
 import static edu.neu.picogram.NonogramUtils.drawNonogram;
+import static edu.neu.picogram.NonogramUtils.savaJson;
+import static edu.neu.picogram.NonogramUtils.saveGame;
 import static edu.neu.picogram.NonogramUtils.updateGame;
 
 import android.Manifest;
@@ -41,6 +43,8 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -195,11 +199,12 @@ public class TakePhotoActivity extends AppCompatActivity {
 //                startActivity(intent);
                 if (bitmap != null) {
                     userNonogram = new UserNonogram();
-                    int size = 100;
+                    int size = 50;
                     int[][] gameArray = convertToNonogramMatrix(bitmap, size);
                     userNonogram.setSolution(gameArray);
                     userNonogram.setHeight(size);
                     userNonogram.setWidth(size);
+                    userNonogram.setCurrentGrid(gameArray);
 
                     bitmap = drawNonogram(userNonogram);
                     imageView.setImageBitmap(bitmap);
@@ -218,6 +223,10 @@ public class TakePhotoActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // add the LargeScaleGame to the phone
                 Intent intent = new Intent(TakePhotoActivity.this, GamePlayActivity.class);
+                String name = "photoGame";
+                updateGame(userNonogram);
+                JSONObject json = saveGame(name, userNonogram.getRowClues(), userNonogram.getColClues(), userNonogram.getSolution());
+                savaJson(TakePhotoActivity.this, json, name);
 
                 startActivity(intent);
 

@@ -26,8 +26,10 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -43,7 +45,7 @@ import org.json.JSONObject;
 
 public class NonogramUtils {
 
-  public static void saveGame(String name, int[][] rowClues, int[][] colClues, int[][] solution) {
+  public static JSONObject saveGame(String name, int[][] rowClues, int[][] colClues, int[][] solution) {
     // 把当前游戏的状态转换为json数组，然后转换为json字符串
     // 当前只是在Logcat中打印出来，后续会把json字符串保存为文件
     JSONArray jsonArray = new JSONArray(Arrays.asList(rowClues));
@@ -55,26 +57,40 @@ public class NonogramUtils {
       jsonObject.put("rowClues", jsonArray);
       jsonObject.put("colClues", jsonArray1);
       jsonObject.put("solution", jsonArray2);
-      String json = jsonObject.toString();
-      Log.d("json", json);
+      jsonObject.put("width", rowClues.length);
+        jsonObject.put("height", colClues.length);
     } catch (Exception e) {
       e.printStackTrace();
     }
+    return jsonObject;
   }
 
-  /**
-   * 读取关卡json文件，更新solution，rowClues，colClues这几个变量.
-   * 方法本质是打开文件，把文件内部先读到byte数组，再转成String，最后通过json解析，转化为json对象.
-   * 在json对象中，通过key，找到对应的json数组，再把json数组转成int数组，或者boolean数组.
-   *
-   * @param fileID res 内raw 文件夹中的文件，实际上有个int类型的id， 通过id，可以找到对应的文件.
-   */
+  public static Nonogram restoreGame(Context context, File file) {
+    try {
+      InputStream inputStream = Files.newInputStream(file.toPath());
+      return restoreGame(inputStream);
+    }catch (Exception e){
+      e.printStackTrace();
+    }
+    return null;
+  }
+
+
   public static Nonogram restoreGame(Context context, int fileID) {
+    try {
+      InputStream inputStream = context.getResources().openRawResource(fileID);
+      return restoreGame(inputStream);
+    }catch (Exception e){
+      e.printStackTrace();
+    }
+    return null;
+  }
+
+  public static Nonogram restoreGame(InputStream inputStream) {
     int[][] rowClues;
     int[][] colClues;
     int[][] solution;
     try {
-      InputStream inputStream = context.getResources().openRawResource(fileID);
       ByteArrayOutputStream result = new ByteArrayOutputStream();
       byte[] buffer = new byte[1024];
       int length;
@@ -226,7 +242,15 @@ public class NonogramUtils {
   public static void savaJson(Context context, JSONObject jsonObject, String fileName) {
     // Save json file
     try {
-      File file = new File(context.getExternalFilesDir(null), fileName + ".json");
+      File dir = new File(context.getExternalFilesDir(null), "nonogram");
+        if (!dir.exists()) {
+            boolean success = dir.mkdir();
+            if (!success) {
+            return;
+            }
+        }
+        File file = new File(dir, fileName + ".json");
+      Log.d("NonogramUtils", "savaJson: " + file.getAbsolutePath());
       if (!file.exists()) {
         boolean success = file.createNewFile();
         if (!success) {

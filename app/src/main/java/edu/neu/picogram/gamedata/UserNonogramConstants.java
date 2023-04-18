@@ -1,121 +1,88 @@
 package edu.neu.picogram.gamedata;
 
-import static edu.neu.picogram.NonogramUtils.saveGameHelper;
+import android.content.Context;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import edu.neu.picogram.Nonogram;
 import edu.neu.picogram.NonogramUtils;
-import edu.neu.picogram.SerializableNonogram;
-import edu.neu.picogram.UserNonogram;
 
-public class UserNonogramConstants {
+public class UserNonogramConstants{
 
-    public static ArrayList<UserNonogram> getUserGames() {
-    ArrayList<UserNonogram> games = new ArrayList<>();
-        UserNonogram game1 =
-                new UserNonogram("Puzzle 1","Tom", 7, "2013-11-11",
-                        5,
-                        5,
-                        new int[][] {{0}, {5}, {1, 1}, {1, 1}, {1, 1}},
-                        new int[][] {{1}, {4}, {1}, {3}, {1, 1}},
-                        new int[][] {
-                                {0, 0, 0, 0, 0},
-                                {1, 1, 1, 1, 1},
-                                {0, 1, 0, 1, 0},
-                                {0, 1, 0, 1, 0},
-                                {0, 1, 0, 0, 1}
-                        });
-        saveGameHelper(game1);
-        games.add(game1);
-
-        UserNonogram game2 = new UserNonogram("Puzzle 2","Mike", 6, "2022-11-11",
-                5,
-                5,
-                new int[][] {{1}, {3}, {3}, {5}, {1}},
-                new int[][] {{1}, {3}, {5}, {3}, {1}},
-                new int[][] {
-                        {0, 0, 1, 0, 0},
-                        {0, 1, 1, 1, 0},
-                        {0, 1, 1, 1, 0},
-                        {1, 1, 1, 1, 1},
-                        {0, 0, 1, 0, 0}
-                });
-        saveGameHelper(game2);
-        games.add(game2);
-
-        UserNonogram game3 = new UserNonogram("Puzzle 3","Tim", 5, "2021-3-3",
-                5,
-                5,
-                new int[][] {{3}, {2, 2}, {1, 1, 1}, {2, 2}, {3}},
-                // "3; 2, 2; 1, 1, 1; 2, 2; 3"
-                new int[][] {{3}, {2, 2}, {1, 1, 1}, {2, 2}, {3}},
-                new int[][] {
-                        {0, 1, 1, 1, 0},
-                        {1, 1, 0, 1, 1},
-                        {1, 0, 1, 0, 1},
-                        {1, 1, 0, 1, 1},
-                        {0, 1, 1, 1, 0}
-                });
-        saveGameHelper(game3);
-        games.add(game3);
-
-        UserNonogram game4 = new UserNonogram("Puzzle 4","Jay", 10, "2020-3-3",
-                5,
-                5,
-                new int[][] {{3}, {2, 2}, {1, 1, 1}, {2, 2}, {3}},
-                new int[][] {{3}, {2, 2}, {1, 1, 1}, {2, 2}, {3}},
-                new int[][] {
-                        {0, 0, 1, 1, 0},
-                        {0, 0, 1, 1, 1},
-                        {1, 0, 1, 0, 0},
-                        {1, 1, 1, 0, 0},
-                        {1, 1, 1, 0, 0}
-                });
-        saveGameHelper(game4);
-        games.add(game4);
-
-        UserNonogram game5 = new UserNonogram("Puzzle 5","Herbert", 100, "2000-3-3",
-                10,
-                10,
-                new int[][] {{1}, {2}, {3}, {1, 1}, {1}, {1}, {3}, {4}, {4}, {2}},
-                new int[][] {{0}, {0}, {2}, {4}, {4}, {9}, {2}, {2}, {0}, {0}},
-                new int[][] {
-                        {0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
-                        {0, 0, 0, 0, 0, 1, 1, 0, 0, 0},
-                        {0, 0, 0, 0, 0, 1, 1, 1, 0, 0},
-                        {0, 0, 0, 0, 0, 1, 0, 1, 0, 0},
-                        {0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
-                        {0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
-                        {0, 0, 0, 1, 1, 1, 0, 0, 0, 0},
-                        {0, 0, 1, 1, 1, 1, 0, 0, 0, 0},
-                        {0, 0, 1, 1, 1, 1, 0, 0, 0, 0},
-                        {0, 0, 0, 1, 1, 0, 0, 0, 0, 0}
-                });
-        saveGameHelper(game5);
-        games.add(game5);
+    public static List<Nonogram> getGames(Context context) {
+        List<Nonogram> games = new ArrayList<>();
+        File dir = new File(context.getExternalFilesDir(null), "nonogram");
+        File[] files = dir.listFiles();
+        for (File file : files) {
+            Log.d("UserNonogramConstants", "getGames: " + file.getName());
+            Nonogram game = NonogramUtils.restoreGame(context, file);
+            if (game != null) {
+                games.add(game);
+            }
+        }
+        Log.d("UserNonogramConstants", "getGames: " + games.size());
+        return games;
+    }
+    public static ArrayList<Nonogram> getGames(Context context, int index) {
+        Nonogram nonogram = getGames(context).get(index);
+        if (nonogram == null) {
+            return null;
+        }
+        String name = nonogram.getName();
+        ArrayList<Nonogram> games = new ArrayList<>();
+        int[][] solution = nonogram.getSolution();
+        int[][][] subMatrices = splitMatrix(solution, 10, 10);
+        for (int i = 0; i < subMatrices.length; i++) {
+            int[][] subMatrix = subMatrices[i];
+            Nonogram game = new Nonogram(name + "Puzzle " + (i + 1), 10, 10, null, null, null, subMatrix);
+            NonogramUtils.updateGame(game);
+            game.setCurrentGrid(new int[10][10]);
+            games.add(game);
+        }
 
         return games;
     }
-
-    public static Nonogram getUserGame(int index) {
-        return getUserGames().get(index);
+    public static Nonogram getGame(Context context, int outerIndex, int innerIndex) {
+        return getGames(context, outerIndex).get(innerIndex);
     }
 
-    @NonNull
-    @Override
-    public String toString() {
-        // try to print out the nonogram list by calling the toString() method
-        // of each nonogram in the list
-        StringBuilder sb = new StringBuilder();
-        for (UserNonogram game : getUserGames()) {
-            sb.append(game.toString());
+    public static int getGameWidth(Context context, int index) {
+        Nonogram nonogram = getGames(context).get(index);
+        if (nonogram == null) {
+            return 0;
+        }
+        return nonogram.getWidth();
+    }
+
+    public static int getGameHeight(Context context, int index) {
+        Nonogram nonogram = getGames(context).get(index);
+        if (nonogram == null) {
+            return 0;
+        }
+        return nonogram.getHeight();
+    }
+
+    private static int[][][] splitMatrix(int[][] inputMatrix, int numRows, int numCols) {
+        int rowSize = inputMatrix.length / numRows;
+        int colSize = inputMatrix[0].length / numCols;
+        int[][][] outputMatrices = new int[rowSize * colSize][numRows][numCols];
+
+        for (int r = 0; r < rowSize; r++) {
+            for (int c = 0; c < colSize; c++) {
+                int[][] subMatrix = new int[numRows][numCols];
+                for (int i = 0; i < numRows; i++) {
+                    for (int j = 0; j < numCols; j++) {
+                        subMatrix[i][j] = inputMatrix[r * numRows + i][c * numCols + j];
+                    }
+                }
+                outputMatrices[r * colSize + c] = subMatrix;
+            }
         }
 
-        return sb.toString();
+        return outputMatrices;
     }
+
 }

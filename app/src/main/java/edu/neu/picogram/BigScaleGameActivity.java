@@ -23,13 +23,14 @@ public class BigScaleGameActivity extends AppCompatActivity {
     setContentView(R.layout.activity_big_scale_game);
     GridLayout gridLayout = findViewById(R.id.gridLayout);
     index = getIntent().getIntExtra("index", 0);
+    Nonogram BigGame = LargeScaleGameConstants.getGames(this).get(index);
     List<Nonogram> games = LargeScaleGameConstants.getGames(this, index);
     if (games == null) {
       Log.e("BigScaleGameActivity", "games is null");
       return;
     }
-    gridLayout.setRowCount(LargeScaleGameConstants.getGameHeight(this, index) / 10);
-    gridLayout.setColumnCount(LargeScaleGameConstants.getGameWidth(this, index) / 10);
+    gridLayout.setRowCount(BigGame.getHeight() / 10);
+    gridLayout.setColumnCount(BigGame.getWidth() / 10);
     boolean isUnlocked = loadIsUnlocked();
     for (int i = 0; i < games.size(); i++) {
       Nonogram game = games.get(i);
