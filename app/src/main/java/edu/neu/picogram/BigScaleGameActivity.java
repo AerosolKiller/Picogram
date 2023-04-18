@@ -16,6 +16,7 @@ public class BigScaleGameActivity extends AppCompatActivity {
 
   SharedPreferences sharedPreferences;
   int index;
+  String gameName;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +25,7 @@ public class BigScaleGameActivity extends AppCompatActivity {
     GridLayout gridLayout = findViewById(R.id.gridLayout);
     index = getIntent().getIntExtra("index", 0);
     Nonogram BigGame = LargeScaleGameConstants.getGames(this).get(index);
+    gameName = BigGame.getName();
     List<Nonogram> games = LargeScaleGameConstants.getGames(this, index);
     if (games == null) {
       Log.e("BigScaleGameActivity", "games is null");
@@ -32,6 +34,10 @@ public class BigScaleGameActivity extends AppCompatActivity {
     gridLayout.setRowCount(BigGame.getHeight() / 10);
     gridLayout.setColumnCount(BigGame.getWidth() / 10);
     boolean isUnlocked = loadIsUnlocked();
+    updateGrid(gridLayout, games, isUnlocked);
+  }
+
+  private void updateGrid(GridLayout gridLayout, List<Nonogram> games, boolean isUnlocked) {
     for (int i = 0; i < games.size(); i++) {
       Nonogram game = games.get(i);
       ImageView imageView = new ImageView(this);
@@ -56,11 +62,25 @@ public class BigScaleGameActivity extends AppCompatActivity {
 
   private int loadGameProgress() {
     sharedPreferences = getSharedPreferences("large_game_progress", MODE_PRIVATE);
-    return sharedPreferences.getInt(index + "current_level", 0);
+    return sharedPreferences.getInt(gameName + "current_level", 0);
   }
 
   private boolean loadIsUnlocked() {
     sharedPreferences = getSharedPreferences("game_progress", MODE_PRIVATE);
     return sharedPreferences.getBoolean("unlockAll", false);
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    GridLayout gridLayout = findViewById(R.id.gridLayout);
+    gridLayout.removeAllViews();
+    List<Nonogram> games = LargeScaleGameConstants.getGames(this, index);
+    if (games == null) {
+      Log.e("BigScaleGameActivity", "games is null");
+      return;
+    }
+    boolean isUnlocked = loadIsUnlocked();
+    updateGrid(gridLayout, games, isUnlocked);
   }
 }

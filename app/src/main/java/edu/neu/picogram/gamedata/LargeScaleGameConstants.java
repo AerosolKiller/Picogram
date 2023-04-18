@@ -20,13 +20,16 @@ public class LargeScaleGameConstants {
     ArrayList<Nonogram> games = new ArrayList<>();
     File dir = new File(context.getExternalFilesDir(null), "nonogram");
     File[] files = dir.listFiles();
-    for (File file : files) {
-      Log.d("UserNonogramConstants", "getGames: " + file.getName());
-      Nonogram game = NonogramUtils.restoreGame(context, file);
-      if (game != null) {
-        games.add(game);
+    if (files != null) {
+      for (File file : files) {
+        Log.d("UserNonogramConstants", "getGames: " + file.getName());
+        Nonogram game = NonogramUtils.restoreGame(context, file);
+        if (game != null) {
+          games.add(game);
+        }
       }
     }
+
     for (int largeScaleGameId : largeScaleGameIds) {
       Nonogram game = NonogramUtils.restoreGame(context, largeScaleGameId);
       if (game != null) {
