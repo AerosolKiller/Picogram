@@ -18,8 +18,10 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -36,13 +38,17 @@ import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.google.android.material.textfield.TextInputEditText;
 
 import org.json.JSONObject;
 
@@ -90,6 +96,10 @@ public class TakePhotoActivity extends AppCompatActivity {
     UserNonogram userNonogram;
 
 
+    String gameName;
+    EditText inputGameName;
+
+
     // 拍照，并且保存到本地相册，显示在image View中。但是每次拍照，不会更新image View。
     // 从相册中获取图片，并且显示在image View中。每次选择，可以更新image View。
     // TODO: 实现每次拍照，都可以更新image View。
@@ -104,6 +114,7 @@ public class TakePhotoActivity extends AppCompatActivity {
         cropPhotoButton = findViewById(R.id.btn_transformPhoto);
         getGameButton = findViewById(R.id.btn_getGame);
         addGameToPhoneButton = findViewById(R.id.btn_addGameToPhone);
+        inputGameName = findViewById(R.id.inputGameName);
 
         imageView = findViewById(R.id.imageView1);
         bitmap = null;
@@ -212,6 +223,7 @@ public class TakePhotoActivity extends AppCompatActivity {
                     getGameButton.setVisibility(View.INVISIBLE);
                     cropPhotoButton.setVisibility(View.INVISIBLE);
                     addGameToPhoneButton.setVisibility(View.VISIBLE);
+                    inputGameName.setVisibility(View.VISIBLE);
 
                 } else
                     Toast.makeText(TakePhotoActivity.this, "Please take a photo firstly!", Toast.LENGTH_SHORT).show();
@@ -222,18 +234,74 @@ public class TakePhotoActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // add the LargeScaleGame to the phone
-                Intent intent = new Intent(TakePhotoActivity.this, GamePlayActivity.class);
-                String name = "photoGame";
-                updateGame(userNonogram);
-                JSONObject json = saveGame(name, userNonogram.getRowClues(), userNonogram.getColClues(), userNonogram.getSolution());
-                savaJson(TakePhotoActivity.this, json, name);
 
-                startActivity(intent);
+//                showSaveGameDialog();
+                gameName = inputGameName.getText().toString();
+                if(gameName.length() == 0) {
+                    Toast.makeText(TakePhotoActivity.this, "Please enter the game name!", Toast.LENGTH_SHORT).show();
+                }
+                else {
 
+                    Intent intent = new Intent(TakePhotoActivity.this, GamePlayActivity.class);
+                    gameName = inputGameName.getText().toString();
+                    if (gameName == null) gameName = "photoGame";
+
+                    updateGame(userNonogram);
+                    JSONObject json = saveGame(gameName, userNonogram.getRowClues(), userNonogram.getColClues(), userNonogram.getSolution());
+                    savaJson(TakePhotoActivity.this, json, gameName);
+                    intent.putExtra("gameName", gameName);
+
+                    startActivity(intent);
+                }
 
             }
-
         });
+
+    }
+
+    private void showSaveGameDialog() {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+
+        // Inflate the dialog layout
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.saveeditgame, null);
+
+        // Find the input field and buttons in the dialog layout
+        inputGameName = dialogView.findViewById(R.id.gameName_edit_text);
+
+
+        // Create the dialog
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+
+        // 有一些问题，因此在界面直接用EditText来输入游戏名字；
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Toast.makeText(TakePhotoActivity.this, "Game saved", Toast.LENGTH_SHORT).show();
+                gameName = inputGameName.getText().toString() + "_";
+                Intent intent = new Intent(TakePhotoActivity.this, GamePlayActivity.class);
+                gameName = "photoGame";
+
+                updateGame(userNonogram);
+                JSONObject json = saveGame(gameName, userNonogram.getRowClues(), userNonogram.getColClues(), userNonogram.getSolution());
+                savaJson(TakePhotoActivity.this, json, gameName);
+                intent.putExtra("gameName", gameName);
+
+                startActivity(intent);
+            }
+        });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Toast.makeText(TakePhotoActivity.this, "Game not saved", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        dialog.dismiss();
+
 
     }
 
@@ -361,7 +429,6 @@ public class TakePhotoActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
             contentValues.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Picogram");
         }
-
 
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);

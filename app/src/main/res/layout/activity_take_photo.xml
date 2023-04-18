@@ -65,8 +65,16 @@
         android:layout_alignParentBottom="true"
         android:visibility="invisible"
         android:text="Add Game to Phone"
-        android:layout_centerHorizontal="true"
+        android:layout_alignParentEnd="true"
         />
+
+    <EditText
+        android:id="@+id/inputGameName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:hint="Edit the game name"
+        android:visibility="invisible"/>
 
 
 </RelativeLayout>
