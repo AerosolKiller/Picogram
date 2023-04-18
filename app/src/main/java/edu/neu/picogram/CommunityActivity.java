@@ -321,7 +321,8 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
 
 //                    userRef.update("likedNum", FieldValue.increment(1));
                     if(nonogram.getLikedNum() < 0) nonogram.setLikedNum(0);
-                    userRef.update("likedNum", nonogram.getLikedNum() + 1);
+                    nonogram.setLikedNum(nonogram.getLikedNum() + 1);
+                    userRef.update("likedNum", nonogram.getLikedNum());
                     holder.likeButton.setImageResource(R.drawable.baseline_thumb_up_alt_24);
 
                     getLikedNumFromFirestore(nonogram.getName())
@@ -341,6 +342,7 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
                     DocumentReference userRef = db.collection("games").document(nonogram.getName());
 
                     if(nonogram.getLikedNum() < 0) nonogram.setLikedNum(0);
+                    nonogram.setLikedNum(nonogram.getLikedNum() - 1);
                     userRef.update("likedNum", nonogram.getLikedNum());
                     holder.likeButton.setImageResource(R.drawable.baseline_thumb_up_off_alt_24);
                     getLikedNumFromFirestore(nonogram.getName())
