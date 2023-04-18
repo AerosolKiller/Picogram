@@ -364,6 +364,7 @@ class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder>
     });
   }
 
+
   // 返回数据的个数
   @Override
   public int getItemCount() {

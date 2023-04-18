@@ -100,6 +100,16 @@ class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder> {
 
     Nonogram game = games.get(position);
     holder.gameName.setText(game.getName());
+    // 设置每个图像的宽度和高度
+    ViewGroup.LayoutParams layoutParams = holder.gameImage.getLayoutParams();
+    if (mode.equals("large")) {
+      layoutParams.width = 200;
+      layoutParams.height = 200;
+    } else {
+      layoutParams.width = 100;
+      layoutParams.height = 100;
+    }
+
     boolean isUnlocked = position <= loadGameProgress() || loadIsUnlocked();
     holder.itemView.setOnClickListener(
         v -> {
