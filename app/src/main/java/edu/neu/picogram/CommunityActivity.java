@@ -2,11 +2,8 @@ package edu.neu.picogram;
 
 import static android.content.ContentValues.TAG;
 import static edu.neu.picogram.CommunityActivity.getUserFromFirestore;
-import static edu.neu.picogram.CommunityActivity.user;
 import static edu.neu.picogram.NonogramUtils.drawNonogram;
 import static edu.neu.picogram.NonogramUtils.getLikedNumFromFirestore;
-import static edu.neu.picogram.NonogramUtils.getNonogramListFromFireStore;
-import static edu.neu.picogram.gamedata.UserNonogramConstants.getUserGames;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
