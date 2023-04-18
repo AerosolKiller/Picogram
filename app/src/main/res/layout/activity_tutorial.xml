@@ -8,19 +8,21 @@
 
     <TextView
         android:id="@+id/description"
+        android:layout_margin="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="18sp"
         android:gravity="center"
         app:layout_constraintBottom_toTopOf="@+id/nonogramView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+ />
 
     <edu.neu.picogram.NonogramView
         android:id="@+id/nonogramView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.6"
+        app:layout_constraintHeight_percent="0.4"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

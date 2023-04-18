@@ -79,7 +79,7 @@ public class TutorialActivity extends AppCompatActivity {
             nonogramView.invalidate();
           });
     } else {
-      nonogramView.setVisibility(NonogramView.GONE);
+      nonogramView.setVisibility(NonogramView.INVISIBLE);
       imageView.setVisibility(ImageView.VISIBLE);
       checkBox.setVisibility(CheckBox.INVISIBLE);
       switchCompat.setVisibility(SwitchCompat.INVISIBLE);

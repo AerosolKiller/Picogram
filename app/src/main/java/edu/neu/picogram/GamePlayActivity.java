@@ -103,11 +103,11 @@ class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder> {
     // 设置每个图像的宽度和高度
     ViewGroup.LayoutParams layoutParams = holder.gameImage.getLayoutParams();
     if (mode.equals("large")) {
-      layoutParams.width = 200;
-      layoutParams.height = 200;
+      layoutParams.width = 300;
+      layoutParams.height = 300;
     } else {
-      layoutParams.width = 100;
-      layoutParams.height = 100;
+      layoutParams.width = 150;
+      layoutParams.height = 150;
     }
 
     boolean isUnlocked = position <= loadGameProgress() || loadIsUnlocked();
