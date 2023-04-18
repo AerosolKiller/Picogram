@@ -27,6 +27,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
+        android:visibility="invisible"
         android:background="@android:color/transparent"
         android:src="@drawable/backarrow"
         app:layout_constraintStart_toStartOf="parent"

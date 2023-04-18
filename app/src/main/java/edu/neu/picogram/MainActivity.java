@@ -1,6 +1,8 @@
 package edu.neu.picogram;
 
 import android.Manifest;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -13,6 +15,9 @@ import android.os.Bundle;
 import android.content.Intent;
 import android.provider.MediaStore;
 import android.view.View;
+import android.widget.Toast;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,6 +28,30 @@ public class MainActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+
+    // 找到主页的底部导航栏，设置监听器，点击不同的按钮跳转到不同的页面
+    BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+    bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+      switch (item.getItemId()) {
+        case R.id.nav_play:
+          Intent intent = new Intent(MainActivity.this, MainActivity.class);
+          startActivity(intent);
+          break;
+        case R.id.nav_create:
+          Intent intent1 = new Intent(MainActivity.this, EditActivity.class);
+          startActivity(intent1);
+          break;
+        case R.id.nav_community:
+          Intent intent2 = new Intent(MainActivity.this, CommunityActivity.class);
+          startActivity(intent2);
+          break;
+
+      }
+      return true;
+    });
+
+
+
   }
 
   public void onClick(View view) {
@@ -53,4 +82,6 @@ public class MainActivity extends AppCompatActivity {
       startActivity(intent);
     }
   }
+
+
 }

@@ -8,6 +8,7 @@ import static edu.neu.picogram.NonogramUtils.saveGame;
 import static edu.neu.picogram.NonogramUtils.saveNonogramToFireStore;
 import static edu.neu.picogram.NonogramUtils.updateGame;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
@@ -27,6 +28,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -63,10 +65,31 @@ public class EditActivity extends AppCompatActivity {
   Uri bitmapUri;
   Nonogram game;
 
+  BottomNavigationView bottomNavigationView;
+
+  @SuppressLint("MissingInflatedId")
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_edit);
+
+     bottomNavigationView = findViewById(R.id.bottomNavigationView_create);
+     bottomNavigationView.setOnNavigationItemSelectedListener(v -> {
+       switch (v.getItemId()) {
+         case R.id.nav_createByYourself:
+           Intent intent = new Intent(EditActivity.this, EditActivity.class);
+           startActivity(intent);
+           break;
+         case R.id.nav_createByPhoto:
+           Intent intent1 = new Intent(EditActivity.this, TakePhotoActivity.class);
+           startActivity(intent1);
+           break;
+
+       }
+       return true;
+     });
+
+
     // access database
     db = FirebaseFirestore.getInstance();
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
