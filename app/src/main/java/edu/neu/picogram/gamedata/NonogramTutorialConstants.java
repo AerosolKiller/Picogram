@@ -77,8 +77,8 @@ public class NonogramTutorialConstants {
     NonogramTutorial nonogramTutorial6 =
         new NonogramTutorial(
             "Nonogram Tutorial 6",
-            "When the right squares have been filled in on a line it is wise to make the empty squares black. to finish the puzzle\n"
-                + "Mark the remaining square with a cross.\n",
+            "To complete the puzzle, first fill in the correct squares on each line and then make the empty squares black. \n"
+                + "Finally, click on the cross button to mark the remaining square.\n",
             true,
             5,
             1,
@@ -92,7 +92,8 @@ public class NonogramTutorialConstants {
     NonogramTutorial nonogramTutorial7 =
         new NonogramTutorial(
             "Nonogram Tutorial 7",
-            "Fill in this line.\n",
+            "Fill in this line.\n" + "Fill 3 solid squares and 1 solid square in this line. \n"
+                + "There is 1 empty square in between. \n" + "Remember to use the cross sign to make the empty square!",
             true,
             5,
             1,
@@ -105,7 +106,7 @@ public class NonogramTutorialConstants {
     NonogramTutorial nonogramTutorial8 =
         new NonogramTutorial(
             "Nonogram Tutorial 8",
-            "Fill in this line.\n",
+            "Switch to cross sign to fill out this line.\n",
             true,
             5,
             1,
@@ -128,7 +129,8 @@ public class NonogramTutorialConstants {
     NonogramTutorial nonogramTutorial10 =
         new NonogramTutorial(
             "Nonogram Tutorial 10",
-            "Using this method which squares can be filled in?\n",
+            "Using the previous method to fill this line.\n" + " which squares can be filled in? \n"
+                + "Hint: think about which square/squares have to be fill out anyway?",
             true,
             5,
             1,
@@ -141,7 +143,8 @@ public class NonogramTutorialConstants {
     NonogramTutorial nonogramTutorial11 =
         new NonogramTutorial(
             "Nonogram Tutorial 11",
-            "WHich squares can be filled in?\n",
+            "Three are three possibilities for placing 3 continuously solid squares in this line\n"
+                + "which square has to be filled in?",
             true,
             5,
             1,
@@ -153,7 +156,7 @@ public class NonogramTutorialConstants {
     NonogramTutorial nonogramTutorial12 =
         new NonogramTutorial(
             "Nonogram Tutorial 12",
-            "WHich squares can be filled in?\n",
+            "Which squares can be filled in?\n",
             true,
             5,
             1,
