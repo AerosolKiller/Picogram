@@ -27,6 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/image"
         android:textSize="16sp"
+        android:fontFamily="casual"
         android:textColor="@color/black"
         android:layout_margin="5dp"
         android:textStyle="bold"
@@ -50,6 +51,7 @@
         android:layout_below="@+id/image"
         android:layout_marginTop="10dp"
         android:layout_alignEnd="@+id/image"
+        android:fontFamily="casual"
         android:text="0" />
 
 

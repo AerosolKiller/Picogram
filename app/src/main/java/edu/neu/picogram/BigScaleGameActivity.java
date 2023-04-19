@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.GridLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
 import edu.neu.picogram.gamedata.LargeScaleGameConstants;
@@ -18,10 +19,13 @@ public class BigScaleGameActivity extends AppCompatActivity {
   int index;
   String gameName;
 
+  ImageButton backButton;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_big_scale_game);
+    backButton = findViewById(R.id.backToPlayButton);
     GridLayout gridLayout = findViewById(R.id.gridLayout);
     index = getIntent().getIntExtra("index", 0);
     Nonogram BigGame = LargeScaleGameConstants.getGames(this).get(index);
@@ -35,13 +39,15 @@ public class BigScaleGameActivity extends AppCompatActivity {
     gridLayout.setColumnCount(BigGame.getWidth() / 10);
     boolean isUnlocked = loadIsUnlocked();
     updateGrid(gridLayout, games, isUnlocked);
+
+    backButton.setOnClickListener(v -> backToPlay());
   }
 
   private void updateGrid(GridLayout gridLayout, List<Nonogram> games, boolean isUnlocked) {
     for (int i = 0; i < games.size(); i++) {
       Nonogram game = games.get(i);
       ImageView imageView = new ImageView(this);
-      imageView.setImageBitmap(drawNonogram(game, 150));
+      imageView.setImageBitmap(drawNonogram(game, 250));
       int finalI = i;
       if (!isUnlocked && i > loadGameProgress()) {
         imageView.setAlpha(0.5f);
@@ -82,5 +88,10 @@ public class BigScaleGameActivity extends AppCompatActivity {
     }
     boolean isUnlocked = loadIsUnlocked();
     updateGrid(gridLayout, games, isUnlocked);
+  }
+
+  private void backToPlay() {
+    Intent intent = new Intent(this, GamePlayActivity.class);
+    startActivity(intent);
   }
 }

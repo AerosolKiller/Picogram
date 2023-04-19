@@ -9,4 +9,12 @@
     <string name="sign_in">Sign In</string>
     <string name="text_label">Please login firstly!</string>
     <string name="new_username">New Username</string>
+    <string name="create_game">Create game</string>
+    <string name="log_in_or_create_an_account_to_save_your_picogram_journey">Log in or create an account to save your picogram journey</string>
+    <string name="help">Help</string>
+    <string name="create">Create</string>
+    <string name="check">Check</string>
+    <string name="choose_a_name_for_your_creation">Choose a name for your creation!</string>
+    <string name="save_name">Save name</string>
+    <string name="cancel">cancel</string>
 </resources>

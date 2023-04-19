@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -34,6 +35,8 @@ public class GamePlayActivity extends AppCompatActivity {
   List<Nonogram> largeScaleGames;
   SharedPreferences sharedPreferences;
 
+  ImageButton homeButton;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -41,6 +44,7 @@ public class GamePlayActivity extends AppCompatActivity {
     largeScaleGames = LargeScaleGameConstants.getGames(this);
     setContentView(R.layout.activity_game_play);
     sharedPreferences = getSharedPreferences("game_progress", MODE_PRIVATE);
+    homeButton = findViewById(R.id.homeButton);
 
     SwitchCompat unlockAll = findViewById(R.id.unLockALl);
     unlockAll.setOnClickListener(
@@ -49,6 +53,7 @@ public class GamePlayActivity extends AppCompatActivity {
           createRecyclerView();
         });
     createRecyclerView();
+    homeButton.setOnClickListener(v -> backToHome());
   }
 
   public void createRecyclerView() {
@@ -72,6 +77,11 @@ public class GamePlayActivity extends AppCompatActivity {
   public void onResume() {
     super.onResume();
     createRecyclerView();
+  }
+
+  private void backToHome() {
+    Intent intent = new Intent(this, MainActivity.class);
+    startActivity(intent);
   }
 }
 

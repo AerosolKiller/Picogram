@@ -10,7 +10,8 @@
         android:id="@+id/new_username_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/new_username">
+        android:hint="@string/new_username"
+        android:fontFamily="casual">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/new_username_edit_text"

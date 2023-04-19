@@ -10,7 +10,8 @@
         android:id="@+id/tv_saveGameName"
         android:layout_width="379dp"
         android:layout_height="43dp"
-        android:text="Choose a name for your creation!"
+        android:text="@string/choose_a_name_for_your_creation"
+        android:fontFamily="casual"
         android:textAlignment="center"
         android:textSize="20sp"
         android:textStyle="bold" />
@@ -24,7 +25,8 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/gameName_edit_text"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:fontFamily="casual"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
@@ -32,12 +34,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Save name" />
+        android:text="@string/save_name"
+        android:fontFamily="casual"/>
     <Button
         android:id="@+id/cancel_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="cancel" />
+        android:text="@string/cancel"
+        android:fontFamily="casual"/>
 
 </LinearLayout>

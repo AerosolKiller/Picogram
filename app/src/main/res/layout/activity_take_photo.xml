@@ -14,6 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Click on the below button to take photo"
+        android:fontFamily="casual"
         />
 
     <Button
@@ -22,6 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/text"
         android:text="Take Photo"
+        android:fontFamily="casual"
         android:layout_centerHorizontal="true"
         />
 
@@ -31,6 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/btn_takephoto"
         android:text="Get Photo from Gallery"
+        android:fontFamily="casual"
         android:layout_centerHorizontal="true"
         />
 
@@ -47,6 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_above="@+id/btn_getGame"
+        android:fontFamily="casual"
         android:text="crop the photo" />
 
     <Button
@@ -55,6 +59,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:text="Get Game from photo"
+        android:fontFamily="casual"
         android:layout_centerHorizontal="true"
          />
 

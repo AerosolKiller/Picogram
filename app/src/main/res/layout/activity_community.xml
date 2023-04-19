@@ -11,6 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Player Community"
+        android:fontFamily="casual"
         android:layout_marginTop="16dp"
         android:textSize="24sp"
         android:textStyle="bold"
@@ -28,6 +29,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:visibility="invisible"
+        android:fontFamily="casual"
         android:background="@android:color/transparent"
         android:src="@drawable/backarrow"
         app:layout_constraintStart_toStartOf="parent"
@@ -43,6 +45,7 @@
         android:layout_marginBottom="8dp"
         android:text="Popular"
         android:onClick="onClick"
+        android:fontFamily="casual"
         app:layout_constraintEnd_toStartOf="@+id/newest"
         app:layout_constraintStart_toEndOf="@+id/sortBy"
         app:layout_constraintTop_toBottomOf="@+id/imageButton1" />
@@ -56,6 +59,7 @@
         android:layout_marginBottom="8dp"
         android:text="Newest"
         android:onClick="onClick"
+        android:fontFamily="casual"
         app:layout_constraintStart_toEndOf="@+id/popular"
         app:layout_constraintTop_toTopOf="@+id/popular" />
 
@@ -68,6 +72,7 @@
         android:layout_marginBottom="8dp"
         android:text="Favorite"
         android:onClick="onClick"
+        android:fontFamily="casual"
         android:visibility="invisible"
         app:layout_constraintTop_toTopOf="@id/popular"
         app:layout_constraintStart_toEndOf="@+id/newest" />

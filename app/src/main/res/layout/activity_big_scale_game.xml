@@ -7,7 +7,7 @@
     tools:context=".BigScaleGameActivity">
 
     <ImageButton
-        android:id="@+id/imageButton3"
+        android:id="@+id/backToPlayButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -21,13 +21,14 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="casual"
         android:text="Solve this picture piece by piece!"
-        android:textSize="18sp"
         android:textColor="@color/black"
+        android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@id/gridLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/imageButton3"
+        app:layout_constraintTop_toBottomOf="@id/backToPlayButton"
         app:layout_constraintVertical_chainStyle="packed" />
     <GridLayout
         android:id="@+id/gridLayout"
