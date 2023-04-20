@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -146,6 +147,27 @@ public class CommunityActivity extends AppCompatActivity {
 
         }
       }
+    });
+
+
+    // 找到主页的底部导航栏，设置监听器，点击不同的按钮跳转到不同的页面
+    BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+    bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+      if( this.getClass().equals(MainActivity.class)) {
+        return true;
+      }
+      switch (item.getItemId()) {
+        case R.id.nav_play:
+          Intent intent1 = new Intent(CommunityActivity.this, MainActivity.class);
+          startActivity(intent1);
+          break;
+        case R.id.nav_create:
+          Intent intent2 = new Intent(CommunityActivity.this, EditActivity.class);
+          startActivity(intent2);
+          break;
+
+      }
+      return true;
     });
   }
 

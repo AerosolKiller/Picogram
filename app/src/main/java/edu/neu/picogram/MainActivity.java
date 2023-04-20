@@ -22,24 +22,26 @@ public class MainActivity extends AppCompatActivity {
 
     // 找到主页的底部导航栏，设置监听器，点击不同的按钮跳转到不同的页面
     BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
-    bottomNavigationView.setOnNavigationItemSelectedListener(
-        item -> {
-          switch (item.getItemId()) {
-            case R.id.nav_play:
-              Intent intent = new Intent(MainActivity.this, MainActivity.class);
-              startActivity(intent);
-              break;
-            case R.id.nav_create:
-              Intent intent1 = new Intent(MainActivity.this, EditActivity.class);
-              startActivity(intent1);
-              break;
-            case R.id.nav_community:
-              Intent intent2 = new Intent(MainActivity.this, CommunityActivity.class);
-              startActivity(intent2);
-              break;
-          }
-          return true;
-        });
+    bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+//      if( this.getClass().equals(MainActivity.class)) {
+//        return true;
+//      }
+      switch (item.getItemId()) {
+        case R.id.nav_create:
+          Intent intent1 = new Intent(MainActivity.this, EditActivity.class);
+          startActivity(intent1);
+          break;
+        case R.id.nav_community:
+          Intent intent2 = new Intent(MainActivity.this, CommunityActivity.class);
+          startActivity(intent2);
+          break;
+
+      }
+      return true;
+    });
+
+
+
   }
 
   public void onClick(View view) {
