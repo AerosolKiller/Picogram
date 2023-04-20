@@ -17,4 +17,5 @@
     <string name="choose_a_name_for_your_creation">Choose a name for your creation!</string>
     <string name="save_name">Save name</string>
     <string name="cancel">cancel</string>
+    <string name="solve_this_picture_piece_by_piece">Solve this picture piece by piece!</string>
 </resources>

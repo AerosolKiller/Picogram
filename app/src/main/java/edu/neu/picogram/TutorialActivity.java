@@ -4,6 +4,7 @@ import static edu.neu.picogram.gamedata.NonogramTutorialConstants.getTutorials;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -23,6 +24,7 @@ public class TutorialActivity extends AppCompatActivity {
   private SwitchCompat switchCompat;
   private ImageView imageView;
   private List<NonogramTutorial> tutorials;
+  private ImageView crossSign, solidSquare;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +35,8 @@ public class TutorialActivity extends AppCompatActivity {
     button = findViewById(R.id.checkAnswer);
     checkBox = findViewById(R.id.hint);
     switchCompat = findViewById(R.id.mode);
+    crossSign = findViewById(R.id.cross_sign);
+    solidSquare = findViewById(R.id.solid_square);
     imageView = findViewById(R.id.image);
     tutorials = getTutorials();
     setTutorial();
@@ -46,6 +50,8 @@ public class TutorialActivity extends AppCompatActivity {
       imageView.setVisibility(ImageView.GONE);
       checkBox.setVisibility(CheckBox.VISIBLE);
       switchCompat.setVisibility(SwitchCompat.VISIBLE);
+      crossSign.setVisibility(View.VISIBLE);
+      solidSquare.setVisibility(View.VISIBLE);
       nonogramView.setGame(tutorial);
 
       button.setOnClickListener(
@@ -83,6 +89,8 @@ public class TutorialActivity extends AppCompatActivity {
       imageView.setVisibility(ImageView.VISIBLE);
       checkBox.setVisibility(CheckBox.INVISIBLE);
       switchCompat.setVisibility(SwitchCompat.INVISIBLE);
+      crossSign.setVisibility(View.INVISIBLE);
+      solidSquare.setVisibility(View.INVISIBLE);
       imageView.setImageResource(tutorial.getImageId());
       button.setOnClickListener(
           v -> {

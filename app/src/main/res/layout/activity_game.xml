@@ -29,22 +29,24 @@
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/mode"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="47dp"
+        android:layout_height="47dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/checkAnswer"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nonogramView" />
+        app:layout_constraintEnd_toStartOf="@+id/cross_sign"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/solid_square"
+        app:layout_constraintTop_toBottomOf="@+id/nonogramView"
+        app:layout_constraintVertical_bias="0.505" />
 
     <Button
         android:id="@+id/checkAnswer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Check"
         android:fontFamily="casual"
+        android:text="Check"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/hintFrame"
-        app:layout_constraintStart_toEndOf="@+id/mode"
+        app:layout_constraintStart_toEndOf="@+id/cross_sign"
         app:layout_constraintTop_toBottomOf="@+id/nonogramView" />
 
     <FrameLayout
@@ -76,6 +78,37 @@
             android:textColor="#ffffff"
             android:textSize="12sp" />
     </FrameLayout>
+
+    <ImageView
+        android:id="@+id/solid_square"
+        android:layout_width="50dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="5dp"
+        android:src="@drawable/square"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nonogramView" />
+
+    <ImageView
+        android:id="@+id/cross_sign"
+        android:layout_width="35dp"
+        android:layout_height="40dp"
+        android:src="@drawable/cross"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/mode"
+        app:layout_constraintTop_toBottomOf="@+id/nonogramView" />
+
+    <!--    <include-->
+<!--        android:id="@+id/customSwitch"-->
+<!--        layout="@layout/customswitch"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_centerInParent="true"-->
+<!--        android:layout_marginStart="24dp"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/nonogramView" />-->
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
