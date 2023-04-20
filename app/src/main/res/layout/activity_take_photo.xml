@@ -19,22 +19,26 @@
 
     <Button
         android:id="@+id/btn_takephoto"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="150dp"
+        android:layout_height="100dp"
         android:layout_below="@+id/text"
         android:text="Take Photo"
         android:fontFamily="casual"
-        android:layout_centerHorizontal="true"
+        android:layout_margin="20dp"
+
         />
+
+
 
     <Button
         android:id="@+id/btn_getPhoto"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btn_takephoto"
+        android:layout_width="150dp"
+        android:layout_height="100dp"
+        android:layout_below="@+id/text"
         android:text="Get Photo from Gallery"
         android:fontFamily="casual"
-        android:layout_centerHorizontal="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="20dp"
         />
 
     <ImageView
@@ -49,7 +53,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
         android:layout_above="@+id/btn_getGame"
+        android:visibility="invisible"
         android:fontFamily="casual"
         android:text="crop the photo" />
 
@@ -57,9 +63,10 @@
         android:id="@+id/btn_getGame"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:text="Get Game from photo"
+        android:layout_above="@+id/btn_addGameToPhone"
+        android:text="Transform photo to game"
         android:fontFamily="casual"
+        android:visibility="invisible"
         android:layout_centerHorizontal="true"
          />
 
@@ -79,7 +86,18 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:hint="Edit the game name"
+
         android:visibility="invisible"/>
+
+    <ImageView
+        android:id="@+id/imageViewExample"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_getPhoto"
+        android:visibility="visible"
+        android:layout_marginTop="50dp"
+        android:layout_centerHorizontal="true"
+        app:srcCompat="@drawable/photo_game_example" />
 
 
 </RelativeLayout>

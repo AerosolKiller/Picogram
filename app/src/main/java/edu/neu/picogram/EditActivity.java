@@ -76,10 +76,10 @@ public class EditActivity extends AppCompatActivity {
      bottomNavigationView = findViewById(R.id.bottomNavigationView_create);
      bottomNavigationView.setOnNavigationItemSelectedListener(v -> {
        switch (v.getItemId()) {
-         case R.id.nav_createByYourself:
-           Intent intent = new Intent(EditActivity.this, EditActivity.class);
-           startActivity(intent);
-           break;
+//         case R.id.nav_createByYourself:
+//           Intent intent = new Intent(EditActivity.this, EditActivity.class);
+//           startActivity(intent);
+//           break;
          case R.id.nav_createByPhoto:
            Intent intent1 = new Intent(EditActivity.this, TakePhotoActivity.class);
            startActivity(intent1);

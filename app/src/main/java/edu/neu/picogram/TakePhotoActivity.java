@@ -84,6 +84,8 @@ public class TakePhotoActivity extends AppCompatActivity {
     private ActivityResultLauncher<Intent> resultLauncher;
     ImageView imageView;
 
+    ImageView imageViewExample;
+
     String currentPhotoPath;
 
     private Bitmap bitmap;
@@ -109,6 +111,7 @@ public class TakePhotoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_take_photo);
 
+
         takePhotoButton = findViewById(R.id.btn_takephoto);
         getPhotoButton = findViewById(R.id.btn_getPhoto);
         cropPhotoButton = findViewById(R.id.btn_transformPhoto);
@@ -117,7 +120,12 @@ public class TakePhotoActivity extends AppCompatActivity {
         inputGameName = findViewById(R.id.inputGameName);
 
         imageView = findViewById(R.id.imageView1);
+        imageViewExample = findViewById(R.id.imageViewExample);
         bitmap = null;
+
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 1);
+        }
 
         // 从相册中获取图片,并显示在ImageView中
         getPhotoButton.setOnClickListener(new View.OnClickListener() {
@@ -125,7 +133,7 @@ public class TakePhotoActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // 检查是否有相机权限和读取相册权限，如果没有则申请相机权限
                 if (ContextCompat.checkSelfPermission(TakePhotoActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(TakePhotoActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-//                    ActivityCompat.requestPermissions(TakePhotoActivity.this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+//                   ActivityCompat.requestPermissions(TakePhotoActivity.this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
                     //申请读取文件和照片的权限
                     ActivityCompat.requestPermissions(TakePhotoActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_EXTERNAL_STORAGE_REQUEST_CODE);
                     ActivityCompat.requestPermissions(TakePhotoActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
@@ -133,6 +141,10 @@ public class TakePhotoActivity extends AppCompatActivity {
                     // 有权限，直接读取系统相册
                     Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     startActivityForResult(intent, 2);
+
+//                    cropPhotoButton.setVisibility(View.VISIBLE);
+                    getGameButton.setVisibility(View.VISIBLE);
+                    imageViewExample.setVisibility(View.GONE);
                 }
             }
         });
@@ -144,7 +156,7 @@ public class TakePhotoActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 if (ContextCompat.checkSelfPermission(TakePhotoActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(TakePhotoActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(TakePhotoActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(TakePhotoActivity.this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+//                    ActivityCompat.requestPermissions(TakePhotoActivity.this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
                     //申请读取文件和照片的权限
                     ActivityCompat.requestPermissions(TakePhotoActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_EXTERNAL_STORAGE_REQUEST_CODE);
                     ActivityCompat.requestPermissions(TakePhotoActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
@@ -170,6 +182,11 @@ public class TakePhotoActivity extends AppCompatActivity {
                         imageView.setImageURI(photoUri);
 
                     }
+
+//                    cropPhotoButton.setVisibility(View.VISIBLE);
+                    getGameButton.setVisibility(View.VISIBLE);
+                    imageViewExample.setVisibility(View.GONE);
+
                 }
 
             }
