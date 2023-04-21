@@ -7,11 +7,8 @@ import static edu.neu.picogram.gamedata.NonogramGameConstants.getGame;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.util.Log;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.Chronometer;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +16,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import com.google.firebase.auth.FirebaseAuth;
+
+import java.util.Arrays;
+
 import edu.neu.picogram.gamedata.LargeScaleGameConstants;
 
 public class GameActivity extends AppCompatActivity {
@@ -66,6 +66,9 @@ public class GameActivity extends AppCompatActivity {
     Button button = findViewById(R.id.checkAnswer);
     button.setOnClickListener(
         v -> {
+          if (checkIsEasterEgg(game)) {
+            showDialog("You found the easter egg!\nTime used: ");
+          }
           boolean isSolved = nonogramView.getGame().isSolved();
           if (!isSolved) {
             Toast.makeText(this, "Not solved yet", Toast.LENGTH_SHORT).show();
@@ -76,17 +79,7 @@ public class GameActivity extends AppCompatActivity {
           }
           updateGameProgress(gameId, mode);
           chronometer.stop();
-          AlertDialog.Builder builder = new AlertDialog.Builder(this);
-          builder.setTitle("Congratulations!");
-          builder.setMessage("You have solved the puzzle!\nTime used: " + chronometer.getText());
-          builder.setPositiveButton(
-              "OK",
-              (dialog, which) -> {
-                dialog.dismiss();
-                finish();
-              });
-          builder.show();
-          Toast.makeText(this, "Solved", Toast.LENGTH_SHORT).show();
+          showDialog("You have solved the puzzle!\nTime used: ");
         });
     // 目前显示hint，会把正确答案全部显示出来，nonogramView内部有个状态变量代表是否显示hint
     // 通过set方法，把状态变量传递给nonogramView，然后重新绘制View
@@ -117,6 +110,19 @@ public class GameActivity extends AppCompatActivity {
         });
   }
 
+  private void showDialog(String x) {
+    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    builder.setTitle("Congratulations!");
+    builder.setMessage(x + chronometer.getText());
+    builder.setPositiveButton(
+        "OK",
+        (dialog, which) -> {
+          dialog.dismiss();
+          finish();
+        });
+    builder.show();
+  }
+
   private void updateGameProgress(int index, String mode) {
     if (mode.equals("small")) {
       sharedPreferences = getSharedPreferences("game_progress", MODE_PRIVATE);
@@ -141,5 +147,13 @@ public class GameActivity extends AppCompatActivity {
       editor.putBoolean(gameName + " " + index + "isSolved", true);
       editor.apply();
     }
+  }
+
+  private boolean checkIsEasterEgg(Nonogram game) {
+    int[][] EasterEgg =
+        new int[][] {
+          {0, 1, 1, 1, 0}, {0, 1, 0, 1, 0}, {0, 1, 1, 1, 0}, {0, 1, 0, 0, 0}, {0, 1, 0, 0, 0}
+        };
+    return game.getName().equals("Baby") && Arrays.deepEquals(game.currentGrid, EasterEgg);
   }
 }
