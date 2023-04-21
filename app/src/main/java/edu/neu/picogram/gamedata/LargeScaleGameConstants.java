@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class LargeScaleGameConstants {
 
   public static final int[] largeScaleGameIds = {
-    R.raw.nonogram, R.raw.nonogram2, R.raw.nonogram3, R.raw.nonogram4
+    R.raw.nonogram, R.raw.nonogram2, R.raw.nonogram3, R.raw.nonogram4, R.raw.nonogram5,
   };
 
   public static ArrayList<Nonogram> getGames(Context context) {
