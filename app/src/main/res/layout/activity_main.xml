@@ -22,7 +22,7 @@
         android:id="@+id/bt_tutorial"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
+        android:layout_marginBottom="10dp"
         android:onClick="onClick"
         android:text="@string/tutorial"
         android:fontFamily="casual"
@@ -32,23 +32,26 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_logo" />
+        app:layout_constraintBottom_toTopOf="@id/bt_gameplay"
+        />
 
     <Button
         android:id="@+id/bt_gameplay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="200dp"
+        android:layout_height="80dp"
         android:layout_marginTop="36dp"
         android:onClick="onClick"
         android:text="@string/play"
         android:fontFamily="casual"
         android:textAlignment="center"
         android:textAllCaps="false"
-        android:textSize="16sp"
+        android:textSize="36sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bt_tutorial" />
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+        android:layout_marginBottom="50dp"
+        />
 
     <Button
         android:id="@+id/bt_community"
@@ -57,6 +60,7 @@
         android:layout_marginTop="36dp"
         android:onClick="onClick"
         android:text="@string/community"
+        android:visibility="invisible"
         android:fontFamily="casual"
         android:textAlignment="center"
         android:textAllCaps="false"
@@ -64,9 +68,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bt_gameplay" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
+        android:visibility="invisible"
         android:id="@+id/bt_photo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -83,6 +88,7 @@
         app:layout_constraintTop_toBottomOf="@+id/bt_community" />
 
     <Button
+        android:visibility="invisible"
         android:id="@+id/bt_create"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

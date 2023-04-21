@@ -4,7 +4,7 @@
     <string name="tutorial">Tutorial</string>
     <string name="play">Play</string>
     <string name="community">Community</string>
-    <string name="take_a_photo">Take a photo</string>
+    <string name="take_a_photo">Create game by Photo</string>
     <string name="sign_out">Sign out</string>
     <string name="sign_in">Sign In</string>
     <string name="text_label">Please login firstly!</string>
