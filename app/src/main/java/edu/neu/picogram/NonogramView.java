@@ -22,6 +22,7 @@ public class NonogramView extends View {
   private boolean editMode = false;
   private boolean mode = true;
   private boolean showSolution = false;
+  private boolean tutorialMode = false;
   int cellSize;
   int offsetX;
   int offsetY;
@@ -102,7 +103,21 @@ public class NonogramView extends View {
         // 如果当前需要显示提示，并且当前格子没有被选中，绘制一个蓝色的格子
         else if (showSolution && game.getSolution(row, col) == 1) {
           drawHints(canvas, row, col);
-          showSolution = false;
+          if (!tutorialMode) showSolution = false;
+        } else if (tutorialMode && showSolution && game.getSolution(row, col) == 2) {
+          drawHints(canvas, row, col);
+          canvas.drawLine(
+              col * cellSize + offsetX,
+              row * cellSize + offsetY,
+              (col + 1) * cellSize + offsetX,
+              (row + 1) * cellSize + offsetY,
+              gridPaint);
+          canvas.drawLine(
+              (col + 1) * cellSize + offsetX,
+              row * cellSize + offsetY,
+              col * cellSize + offsetX,
+              (row + 1) * cellSize + offsetY,
+              gridPaint);
         }
       }
     }
@@ -186,7 +201,7 @@ public class NonogramView extends View {
   @Override
   public boolean onTouchEvent(MotionEvent event) {
     performClick();
-    this.setShowSolution(false);
+    if (!tutorialMode) this.setShowSolution(false);
     int action = event.getAction();
     // 可以是按下当前格子，或者从其他格子滑动过来
     boolean isTouchDown = (action == MotionEvent.ACTION_DOWN);
@@ -242,5 +257,9 @@ public class NonogramView extends View {
 
   public void setEditMode(boolean editMode) {
     this.editMode = editMode;
+  }
+
+  public void setTutorialMode(boolean tutorialMode) {
+    this.tutorialMode = tutorialMode;
   }
 }

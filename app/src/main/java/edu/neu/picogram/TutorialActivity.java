@@ -53,6 +53,7 @@ public class TutorialActivity extends AppCompatActivity {
       crossSign.setVisibility(View.VISIBLE);
       solidSquare.setVisibility(View.VISIBLE);
       nonogramView.setGame(tutorial);
+      nonogramView.setTutorialMode(true);
 
       button.setOnClickListener(
           v -> {
