@@ -34,11 +34,11 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_signInOn" />
 
     <Button
-        android:id="@+id/bt_notification"
+        android:id="@+id/bt_tutorial"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
-        android:text="Notification"
+        android:text="@string/tutorial"
         android:fontFamily="casual"
         android:textAllCaps="false"
         android:textSize="16sp"
@@ -46,6 +46,7 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/bt_help" />
+
 
     <Button
         android:id="@+id/bt_createAccount"

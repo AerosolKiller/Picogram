@@ -25,18 +25,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-
 public class SettingActivity extends AppCompatActivity {
 
   private FirebaseAuth mAuth;
   private FirebaseAuth.AuthStateListener mAuthStateListener;
-  private Button signInOptionButton, createAccountOptionButton,
-          signOutButton, helpButton;
+  private Button signInOptionButton,
+      createAccountOptionButton,
+      signOutButton,
+      helpButton,
+      TutorialButton;
   private ImageButton homeButton;
   private FirebaseFirestore db;
   private FirebaseUser user;
 
   private TextView tv_signInOn;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -49,27 +52,30 @@ public class SettingActivity extends AppCompatActivity {
     tv_signInOn = findViewById(R.id.tv_signInOn);
     signOutButton = findViewById(R.id.bt_signOut);
     helpButton = findViewById(R.id.bt_help);
+    TutorialButton = findViewById(R.id.bt_tutorial);
 
     mAuth = FirebaseAuth.getInstance();
     db = FirebaseFirestore.getInstance();
 
-    mAuthStateListener = firebaseAuth -> {
-      user = firebaseAuth.getCurrentUser();
-      if (user != null) {
-        signInOptionButton.setVisibility(View.GONE);
-        createAccountOptionButton.setVisibility(View.GONE);
-        signOutButton.setVisibility(View.VISIBLE);
-        String uid = user.getUid();
-        getUserFromFirestore(uid);
-        fetchUsername(uid);
-      }
-    };
+    mAuthStateListener =
+        firebaseAuth -> {
+          user = firebaseAuth.getCurrentUser();
+          if (user != null) {
+            signInOptionButton.setVisibility(View.GONE);
+            createAccountOptionButton.setVisibility(View.GONE);
+            signOutButton.setVisibility(View.VISIBLE);
+            String uid = user.getUid();
+            getUserFromFirestore(uid);
+            fetchUsername(uid);
+          }
+        };
 
     signInOptionButton.setOnClickListener(v -> showSignInDialog());
     createAccountOptionButton.setOnClickListener(v -> showCreateAccountDialog());
     signOutButton.setOnClickListener(v -> signOutAccount());
     homeButton.setOnClickListener(v -> backToHome());
     helpButton.setOnClickListener(v -> helpPage());
+    TutorialButton.setOnClickListener(v -> tutorialPage());
   }
 
   protected void onStart() {
@@ -95,20 +101,24 @@ public class SettingActivity extends AppCompatActivity {
     AlertDialog signInDialog = builder.create();
     signInDialog.show();
 
-    signInToAccount.setOnClickListener(v -> {
-      String email = et_email.getText().toString();
-      String password = et_password.getText().toString();
+    signInToAccount.setOnClickListener(
+        v -> {
+          String email = et_email.getText().toString();
+          String password = et_password.getText().toString();
 
-      if (!email.isEmpty() && !password.isEmpty()) {
-        signIn(email, password);
-        signInDialog.dismiss();
-      }
-    });
+          if (!email.isEmpty() && !password.isEmpty()) {
+            signIn(email, password);
+            signInDialog.dismiss();
+          }
+        });
   }
 
   private void signIn(String email, String password) {
-    mAuth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this, task -> {
+    mAuth
+        .signInWithEmailAndPassword(email, password)
+        .addOnCompleteListener(
+            this,
+            task -> {
               if (task.isSuccessful()) {
                 Toast.makeText(this, "sign in successfully", Toast.LENGTH_SHORT).show();
               } else {
@@ -116,7 +126,6 @@ public class SettingActivity extends AppCompatActivity {
               }
             });
   }
-
 
   private void showCreateAccountDialog() {
     AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -132,65 +141,80 @@ public class SettingActivity extends AppCompatActivity {
     AlertDialog createAccountDialog = builder.create();
     createAccountDialog.show();
 
-    createAccountButton.setOnClickListener(v -> {
-      String email = et_email.getText().toString();
-      String password = et_password.getText().toString();
-      String userName = et_userName.getText().toString();
+    createAccountButton.setOnClickListener(
+        v -> {
+          String email = et_email.getText().toString();
+          String password = et_password.getText().toString();
+          String userName = et_userName.getText().toString();
 
-      if (!email.isEmpty() && !password.isEmpty() && !userName.isEmpty()) {
-        checkUsernameAndEmail(userName, email)
-                .addOnCompleteListener(task -> {
-                  if (task.isSuccessful()) {
-                    int result = task.getResult();
-                    if (result == -1) {
-                      Toast.makeText(this, "Username or email already exists", Toast.LENGTH_LONG).show();
-                    } else if (result == 1) {
-                      createAccount(email, password, userName);
-                    } else {
-                      Toast.makeText(this, "Failed to save user's info", Toast.LENGTH_LONG).show();
-                    }
-                  }
-                });
-        createAccountDialog.dismiss();
-      } else {
-        Toast.makeText(this, "Please fill out all fields!", Toast.LENGTH_LONG).show();
-      }
-    });
+          if (!email.isEmpty() && !password.isEmpty() && !userName.isEmpty()) {
+            checkUsernameAndEmail(userName, email)
+                .addOnCompleteListener(
+                    task -> {
+                      if (task.isSuccessful()) {
+                        int result = task.getResult();
+                        if (result == -1) {
+                          Toast.makeText(
+                                  this, "Username or email already exists", Toast.LENGTH_LONG)
+                              .show();
+                        } else if (result == 1) {
+                          createAccount(email, password, userName);
+                        } else {
+                          Toast.makeText(this, "Failed to save user's info", Toast.LENGTH_LONG)
+                              .show();
+                        }
+                      }
+                    });
+            createAccountDialog.dismiss();
+          } else {
+            Toast.makeText(this, "Please fill out all fields!", Toast.LENGTH_LONG).show();
+          }
+        });
   }
 
   private void createAccount(String email, String password, String userName) {
-    mAuth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(
-                    this,
-                    task -> {
-                      if (task.isSuccessful()) {
-                        FirebaseUser user = mAuth.getCurrentUser();
-                        String uid = user.getUid();
+    mAuth
+        .createUserWithEmailAndPassword(email, password)
+        .addOnCompleteListener(
+            this,
+            task -> {
+              if (task.isSuccessful()) {
+                FirebaseUser user = mAuth.getCurrentUser();
+                String uid = user.getUid();
 
-                        List<String> playedSmallGameList = new ArrayList<>();
-                        List<String> playedLargeGameList = new ArrayList<>();
-                        List<String> likedGameList = new ArrayList<>();
-                        List<String> collectedGameList = new ArrayList<>();
-                        List<String> creationGameList = new ArrayList<>();
-                        saveUserToFireStore(uid, userName, email,
-                                playedSmallGameList,
-                                playedLargeGameList,
-                                collectedGameList,
-                                likedGameList,
-                                creationGameList);
-                      } else {
-                        Toast.makeText(this, "Account creation failed", Toast.LENGTH_SHORT).show();
-                      }
-                    });
+                List<String> playedSmallGameList = new ArrayList<>();
+                List<String> playedLargeGameList = new ArrayList<>();
+                List<String> likedGameList = new ArrayList<>();
+                List<String> collectedGameList = new ArrayList<>();
+                List<String> creationGameList = new ArrayList<>();
+                saveUserToFireStore(
+                    uid,
+                    userName,
+                    email,
+                    playedSmallGameList,
+                    playedLargeGameList,
+                    collectedGameList,
+                    likedGameList,
+                    creationGameList);
+              } else {
+                Toast.makeText(this, "Account creation failed", Toast.LENGTH_SHORT).show();
+              }
+            });
   }
 
-  private void saveUserToFireStore(String uid, String username, String email,
-                                   List<String> playedSmallGameList,
-                                   List<String> playedLargeGameList,
-                                   List<String> collectedGameList,
-                                   List<String> likedGameList,
-                                   List<String> creationGameList ) {
-    User user = new User(username, email,
+  private void saveUserToFireStore(
+      String uid,
+      String username,
+      String email,
+      List<String> playedSmallGameList,
+      List<String> playedLargeGameList,
+      List<String> collectedGameList,
+      List<String> likedGameList,
+      List<String> creationGameList) {
+    User user =
+        new User(
+            username,
+            email,
             playedSmallGameList,
             playedLargeGameList,
             collectedGameList,
@@ -198,20 +222,24 @@ public class SettingActivity extends AppCompatActivity {
             creationGameList);
 
     db.collection("users")
-            .document(uid)
-            .set(user)
-            .addOnSuccessListener(aVoid -> {
+        .document(uid)
+        .set(user)
+        .addOnSuccessListener(
+            aVoid -> {
               Toast.makeText(this, "User's info saved successfully", Toast.LENGTH_SHORT).show();
             })
-            .addOnFailureListener(error -> {
+        .addOnFailureListener(
+            error -> {
               Toast.makeText(this, "Failed to save user's info", Toast.LENGTH_SHORT).show();
             });
   }
 
   private void getUserFromFirestore(String uid) {
-    db.collection("users").document(uid)
-            .get()
-            .addOnSuccessListener(documentSnapshot -> {
+    db.collection("users")
+        .document(uid)
+        .get()
+        .addOnSuccessListener(
+            documentSnapshot -> {
               if (documentSnapshot.exists()) {
                 User user = documentSnapshot.toObject(User.class);
                 // Access user attributes
@@ -222,7 +250,8 @@ public class SettingActivity extends AppCompatActivity {
                 List<String> creationGameList = user.getCreationGameList();
               }
             })
-            .addOnFailureListener(e -> {
+        .addOnFailureListener(
+            e -> {
               Toast.makeText(this, "Failed to get user's info", Toast.LENGTH_SHORT).show();
             });
   }
@@ -234,17 +263,19 @@ public class SettingActivity extends AppCompatActivity {
     TaskCompletionSource<Integer> taskCompletionSource = new TaskCompletionSource<>();
 
     db.collection("users")
-            .whereEqualTo("username", username)
-            .get()
-            .addOnCompleteListener(task -> {
+        .whereEqualTo("username", username)
+        .get()
+        .addOnCompleteListener(
+            task -> {
               if (task.isSuccessful()) {
                 if (!task.getResult().isEmpty()) {
                   taskCompletionSource.setResult(-1);
                 } else {
                   db.collection("users")
-                          .whereEqualTo("email", email)
-                          .get()
-                          .addOnCompleteListener(task2 -> {
+                      .whereEqualTo("email", email)
+                      .get()
+                      .addOnCompleteListener(
+                          task2 -> {
                             if (task2.isSuccessful()) {
                               if (!task2.getResult().isEmpty()) {
                                 taskCompletionSource.setResult(-1);
@@ -253,7 +284,8 @@ public class SettingActivity extends AppCompatActivity {
                               }
                             } else {
                               Log.w(TAG, "Error checking email", task2.getException());
-                              taskCompletionSource.setException(Objects.requireNonNull(task2.getException()));
+                              taskCompletionSource.setException(
+                                  Objects.requireNonNull(task2.getException()));
                             }
                           });
                 }
@@ -276,9 +308,11 @@ public class SettingActivity extends AppCompatActivity {
   }
 
   private void fetchUsername(String uid) {
-    db.collection("users").document(uid)
-            .get()
-            .addOnCompleteListener(task -> {
+    db.collection("users")
+        .document(uid)
+        .get()
+        .addOnCompleteListener(
+            task -> {
               if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document != null && document.exists()) {
@@ -292,12 +326,15 @@ public class SettingActivity extends AppCompatActivity {
   private void saveNonogramToFireStore(Nonogram nonogram) {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    db.collection("nonogram").document(nonogram.getName())
-            .set(nonogram)
-            .addOnSuccessListener(aVoid -> {
+    db.collection("nonogram")
+        .document(nonogram.getName())
+        .set(nonogram)
+        .addOnSuccessListener(
+            aVoid -> {
               Toast.makeText(this, "Game saved successfully", Toast.LENGTH_SHORT).show();
             })
-            .addOnFailureListener(e -> {
+        .addOnFailureListener(
+            e -> {
               Toast.makeText(this, "Failed to save this game", Toast.LENGTH_SHORT).show();
             });
   }
@@ -305,9 +342,11 @@ public class SettingActivity extends AppCompatActivity {
   private void getNonogramFromFireStore(String gameName) {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    db.collection("nonogram").document(gameName)
-            .get()
-            .addOnSuccessListener(documentSnapshot -> {
+    db.collection("nonogram")
+        .document(gameName)
+        .get()
+        .addOnSuccessListener(
+            documentSnapshot -> {
               if (documentSnapshot.exists()) {
                 UserNonogram nonogram = documentSnapshot.toObject(UserNonogram.class);
 
@@ -320,7 +359,8 @@ public class SettingActivity extends AppCompatActivity {
 
               }
             })
-            .addOnFailureListener(e -> {
+        .addOnFailureListener(
+            e -> {
               Toast.makeText(this, "Failed to retrieve game data", Toast.LENGTH_SHORT).show();
             });
   }
@@ -335,4 +375,8 @@ public class SettingActivity extends AppCompatActivity {
     startActivity(intent);
   }
 
+  private void tutorialPage() {
+    Intent intent = new Intent(this, TutorialActivity.class);
+    startActivity(intent);
+  }
 }

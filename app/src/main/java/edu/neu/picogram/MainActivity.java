@@ -10,8 +10,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
 
-  private static final int CAMERA_PERMISSION_REQUEST_CODE = 1001;
-  private static final int CAMERA_REQUEST_CODE = 1002;
   private SharedPreferences sharedPreferences;
 
   @Override
@@ -22,36 +20,25 @@ public class MainActivity extends AppCompatActivity {
 
     // 找到主页的底部导航栏，设置监听器，点击不同的按钮跳转到不同的页面
     BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
-    bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
-//      if( this.getClass().equals(MainActivity.class)) {
-//        return true;
-//      }
-      switch (item.getItemId()) {
-        case R.id.nav_create:
-          Intent intent1 = new Intent(MainActivity.this, EditActivity.class);
-          startActivity(intent1);
-          break;
-        case R.id.nav_community:
-          Intent intent2 = new Intent(MainActivity.this, CommunityActivity.class);
-          startActivity(intent2);
-          break;
-
-      }
-      return true;
-    });
-
-
-
+    bottomNavigationView.setOnNavigationItemSelectedListener(
+        item -> {
+          switch (item.getItemId()) {
+            case R.id.nav_create:
+              Intent intent1 = new Intent(MainActivity.this, EditActivity.class);
+              startActivity(intent1);
+              break;
+            case R.id.nav_community:
+              Intent intent2 = new Intent(MainActivity.this, CommunityActivity.class);
+              startActivity(intent2);
+              break;
+          }
+          return true;
+        });
   }
 
   public void onClick(View view) {
     if (view.getId() == R.id.ibt_settingButton) {
       Intent intent = new Intent(this, SettingActivity.class);
-      startActivity(intent);
-    }
-    if (view.getId() == R.id.bt_tutorial) {
-      Intent intent = new Intent(this, TutorialActivity.class);
-      sharedPreferences.edit().putBoolean("hasSeenTutorial", true).apply();
       startActivity(intent);
     }
     if (view.getId() == R.id.bt_gameplay) {
